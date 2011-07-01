@@ -11,8 +11,6 @@ namespace li3_zmq\tests\cases\extensions\net\socket;
 
 use li3_zmq\extensions\net\socket\Route;
 
-	ds('echo', true);
-
 class RouteTest extends \lithium\test\Unit {
 
 	public function testGet() {
@@ -44,7 +42,7 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('type' => 'get', 'resource' => 'posts', 'query' => array('admin' => '1'));
-		$result = $route->parse('get/posts/?admin=1')->export();
+		$result = $route->parse('get/posts?admin=1')->export();
 		$this->assertEqual($expected, $result);
 		
 		$expected = array('type' => 'post', 'resource' => 'posts', 'post' => array('name' => 'ui'));
@@ -61,6 +59,7 @@ class RouteTest extends \lithium\test\Unit {
 		
 		foreach (array(
 				'get/posts/11',
+				'get/posts?admin=1',
 				'delete/users/11',
 				'post/users/{"username":"alkemann","email":"alek@example.org"}',
 				'put/users/11/{"username":"alkemann","email":"alek@example.org"}',

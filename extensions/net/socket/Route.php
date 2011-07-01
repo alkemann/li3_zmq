@@ -48,9 +48,18 @@ class Route extends \lithium\core\Object {
 	 */
 	public function __toString() {
 		$arr = $this->export();
-		if (isset($arr['query'])) $arr['query'] = json_encode ($arr['query']);
 		if (isset($arr['post'])) $arr['post'] = json_encode ($arr['post']);
-		return implode('/', array_values($arr));
+		$string = '';
+		if (isset($arr['query'])) {
+			$string = '?';
+			foreach ($arr['query'] as $k => $v) {
+				$string .= "$k=$v";
+			}
+			unset($arr['query']);
+		}
+		$ret = implode('/', array_values($arr));
+		$ret .= $string;
+		return $ret;
 	}
 
 	/**
@@ -92,7 +101,7 @@ class Route extends \lithium\core\Object {
 		$post = isset($requestArr[3]) ? $requestArr[3] : false;
 
 		$query = array();
-		foreach (array('location','post') as $var) {
+		foreach (array('resource','location','post') as $var) {
 			if (strpos($$var, '?') !== false) {
 				list($$var, $query_string) = explode('?', $$var);
 				$params = explode('&', $query_string);
