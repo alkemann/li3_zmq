@@ -25,34 +25,44 @@ class Route extends \lithium\core\Object {
 	// array
 	protected $_post = null;
 
-	public function compile() {
-
-	}
-
 	/**
 	 * Export this object as an array
 	 *
 	 * @return array
 	 */
 	public function export() {
-		$ret = array($this->_type);
-		foreach (array('_resource', '_location', '_query', '_post') as $part) {
-			if (!empty($this->$part)) {
-				$ret[] = $this->$part;
+		$ret = array('type' => $this->_type);
+		foreach (array('resource', 'location', 'query', 'post') as $part) {
+			$var = '_' . $part;
+			if (!empty($this->$var)) {
+				$ret[$part] = $this->$var;
 			}
 		}
 		return $ret;
 	}
 
+	/**
+	 * Output class as string, should be equal to input $request
+	 *
+	 * @return string
+	 */
 	public function __toString() {
-		return implode('/', $this->export());
+		$arr = $this->export();
+		if (isset($arr['query'])) $arr['query'] = json_encode ($arr['query']);
+		if (isset($arr['post'])) $arr['post'] = json_encode ($arr['post']);
+		return implode('/', array_values($arr));
 	}
 
+	/**
+	 * Get protected properties
+	 *
+	 * @param string $key
+	 * @return mixed 
+	 */
 	public function __get($key) {
 		if (in_array($key, array('type', 'resource', 'location', 'query', 'post'))) {
 			return $this->{'_' . $key};
 		}
-		return parent::__get($key);
 	}
 
 	/**
@@ -64,15 +74,20 @@ class Route extends \lithium\core\Object {
 
 	}
 
+	public function compile() {
+
+	}
+
 	/**
 	 * Analyze request and set request params from it
 	 *
 	 * @param type $request
+	 * @return Route
 	 */
 	public function parse($request) {
 		$requestArr = explode('/', $request);
 		$request_type = $requestArr[0]; // no isset. required
-		$resource = $requestArr[1]; // no isset. required
+		$resource = isset($requestArr[1]) ? $requestArr[1] : null;
 		$location = isset($requestArr[2]) ? $requestArr[2] : false;
 		$post = isset($requestArr[3]) ? $requestArr[3] : false;
 
@@ -105,6 +120,7 @@ class Route extends \lithium\core\Object {
 		$this->_type = $request_type;
 		$this->_query = $query;
 		$this->_resource = $resource;
+		return $this;
 	}
 
 }
