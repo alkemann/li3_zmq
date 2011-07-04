@@ -14,25 +14,8 @@ namespace li3_zmq\extensions\net\socket;
  */
 class Response extends \lithium\action\Response {
 
-	protected $_route = null;
-
-	//tmp
-	protected $data = array(
-		'users' => array(
-			13 => array(
-				'id' => 13,
-				'username' => 'viggo',
-				'email' => 'viggo@example.org',
-				'admin' => "true"
-			),
-			14 => array(
-				'id' => 14,
-				'username' => 'strind',
-				'email' => 'strind@example.org',
-				'admin' => "false"
-			),
-		)
-	);
+	protected $_route;
+	protected $_model;
 
 	/**
 	 * Classes used by Response.
@@ -40,12 +23,12 @@ class Response extends \lithium\action\Response {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'router' => 'li3_zmq\net\socket\Router',
-	//	'media' => 'lithium\net\http\Media'
+		'router' => 'li3_zmq\net\socket\Router'
 	);
 
-	public function __construct(Route $route) {
+	public function __construct(Route $route, $model = 'lithium\data\Model') {
 		$this->_route = $route;
+		$this->_model = $model;
 	}
 
 	/**
@@ -79,12 +62,6 @@ class Response extends \lithium\action\Response {
 	 * @return array
 	 */
 	public function put() {
-		if (!isset($this->data[$this->_route->resource][$this->_route->location])) return null;
-		$data = & $this->data[$this->_route->resource][$this->_route->location];
-		foreach ($this->_route->post as $field => $value) {
-			$data[$field] = $value;
-		}
-		return $data;
 	}
 
 	/**
@@ -93,10 +70,6 @@ class Response extends \lithium\action\Response {
 	 * @return array
 	 */
 	public function delete() {
-		if (!isset($this->data[$this->_route->resource][$this->_route->location])) return null;
-		$data = $this->data[$this->_route->resource][$this->_route->location];
-		unset($this->data[$this->_route->resource][$this->_route->location]);
-		return $data;
 	}
 
 	/**
@@ -105,8 +78,6 @@ class Response extends \lithium\action\Response {
 	 * @return array
 	 */
 	public function post() {
-		$this->data[$this->_route->resource][$this->_route->post['id']] = $this->_route->post;
-		return $this->_route->post;
 	}
 
 	/**
@@ -115,42 +86,30 @@ class Response extends \lithium\action\Response {
 	 * $return array asked for data in a container
 	 */
 	public function get() {
-		$container = $this->container();
-		$result = null;
-		if (!empty($this->_route->location)) {
-			if (isset($this->data[$this->_route->resource][$this->_route->location])) {
-				$result['type'] = 'Entity';
-				$row = $this->data[$this->_route->resource][$this->_route->location];
-				$match = true;
-				foreach ($this->_route->query as $field => $value) {
-					$match = ($row[$field] === $value) && $match;
-				}
-				if ($match) {
-					$result['data'] = $row;
-				}
-			}
+		$pk = $this->_route->location;
+		$query = $this->_route->query;;
+
+
+		$model = $this->_model;
+		\lithium\core\Libraries::load($model);
+
+		if ($pk) {
+			$container = $this->container('Entity');
+			$conditions = $query + array($model::meta('name') . '.id' => $pk); // @todo . $model->key());
+			$finder = 'first';
 		} else {
-			if (isset($this->data[$this->_route->resource])) {
-				$result['total'] = count($this->data[$this->_route->resource]);
-				$result['type'] = 'Collection';
-				if (empty($this->_route->query)) {
-					$result['data'] = $this->data[$this->_route->resource];
-				} else {
-					$result['data'] = array();
-					foreach ($this->data[$this->_route->resource] as $key => $row) {
-						$match = true;
-						foreach ($this->_route->query as $field => $value) {
-							$match = ($row[$field] === $value) && $match;
-						}
-						if ($match) {
-							$result['data'][$key] = $row;
-						}
-					}
-				}
-				$result['count'] = count($result['data']);
-			}
+			$container = $this->container('Collection');
+			$conditions = $query;
+			$finder = 'all';
 		}
-		return $result;
+		$collection = $model::find($finder, compact('conditions'));
+		$container['data'] = $collection->to('array');
+
+		if ($container['type'] == 'Collection') {
+			$container['count'] = $container['total'] = $collection->count();
+		}
+
+		return $container;
 	}
 
 	/**
@@ -159,16 +118,24 @@ class Response extends \lithium\action\Response {
 	 * @param mixed $data
 	 * @return array
 	 */
-	public function container($data = false) {
-		return array(
+	public function container($type = 'Collection') {
+		$container = array(
 			'name' => 'Container',
 			'version' => 1,
 			'resource' => $this->_route->resource,
-			'count' => 0,
-			'total' => 0,
-			'type' => 'Collection',
-			'data' => $data
+			'data' => false
 		);
+		if ($type === 'Entity') {
+			$container['type'] = 'entity';
+		} else {
+			$container += array(
+				'count' => 0,
+				'total' => 0,
+				'type' => 'Collection',
+				'data' => false
+			);
+		}
+		return $container;
 	}
 
 	/**
