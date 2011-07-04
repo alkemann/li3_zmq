@@ -95,15 +95,18 @@ class Route extends \lithium\core\Object {
 	 */
 	public function parse($request) {
 		$requestArr = explode('/', $request);
-		$request_type = $requestArr[0]; // no isset. required
-		$resource = isset($requestArr[1]) ? $requestArr[1] : null;
-		$location = isset($requestArr[2]) ? $requestArr[2] : false;
-		$post = isset($requestArr[3]) ? $requestArr[3] : false;
+		$request = array(
+			'request_type' => $requestArr[0], // no isset. required
+			'resource' => isset($requestArr[1]) ? $requestArr[1] : null,
+			'location' => isset($requestArr[2]) ? $requestArr[2] : false,
+			'post' => isset($requestArr[3]) ? $requestArr[3] : false
+		);
 
 		$query = array();
-		foreach (array('resource','location','post') as $var) {
-			if (strpos($$var, '?') !== false) {
-				list($$var, $query_string) = explode('?', $$var);
+		foreach ($request as $var => $value) {
+			if (strpos($value, '?') !== false) {
+				list($v, $query_string) = explode('?', $value);
+				$request[$var] = $v;
 				$params = explode('&', $query_string);
 				foreach ($params as $param) {
 					$paramArr = explode('=', $param);
@@ -112,23 +115,23 @@ class Route extends \lithium\core\Object {
 			}
 		}
 
-		switch ($request_type) {
+		switch ($request['request_type']) {
 			case 'put' :
-				$post = json_decode($post, true);
+				$request['post'] = json_decode($request['post'], true);
 				break;
 			case 'post' :
-				$post =  json_decode($location, true);
-				$location = false;
+				$request['post'] =  json_decode($request['location'], true);
+				$request['location'] = false;
 				break;
 			case 'get' :
 			default :
 				break;
 		}
-		$this->_location = $location;
-		$this->_post = $post;
-		$this->_type = $request_type;
+		$this->_location = $request['location'];
+		$this->_post = $request['post'];
+		$this->_type = $request['request_type'];
 		$this->_query = $query;
-		$this->_resource = $resource;
+		$this->_resource = $request['resource'];
 		return $this;
 	}
 
