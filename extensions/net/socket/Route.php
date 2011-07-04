@@ -66,7 +66,7 @@ class Route extends \lithium\core\Object {
 	 * Get protected properties
 	 *
 	 * @param string $key
-	 * @return mixed 
+	 * @return mixed
 	 */
 	public function __get($key) {
 		if (in_array($key, array('type', 'resource', 'location', 'query', 'post'))) {
