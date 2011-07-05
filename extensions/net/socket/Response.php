@@ -70,6 +70,24 @@ class Response extends \lithium\action\Response {
 	 * @return array
 	 */
 	public function delete() {
+		$pk = $this->_route->location;
+		$query = $this->_route->query;
+
+		$model = $this->__model();
+
+		$conditions = $query + array($model::meta('name') . '.id' => $pk); // @todo . $model->key());
+		$entity = $model::find('first', compact('conditions'));
+
+		$container = $this->container('Entity');
+		if ($entity) {
+			if (!$entity->delete()) {
+				throw new \Exception('Delete failed!');
+			}
+			$container['data'] = $entity->to('array');
+		}
+
+
+		return $container;
 	}
 
 	/**
