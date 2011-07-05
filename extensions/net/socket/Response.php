@@ -62,6 +62,27 @@ class Response extends \lithium\action\Response {
 	 * @return array
 	 */
 	public function put() {
+		$pk = $this->_route->location;
+		$post = $this->_route->post;
+
+		$model = $this->__model();
+
+		$conditions = array($model::meta('name') . '.id' => $pk); // @todo . $model->key());
+		$entity = $model::find('first', compact('conditions'));
+
+		$container = $this->container('Entity');
+
+		if ($entity) {
+			$entity->set($post);
+			if ($entity->validates()) {
+				$entity->save(null, array('validate' => false));
+				$container['data'] = $entity->to('array');
+			} else {
+				$container['errors'] = $entity->errors();
+			}
+		}
+
+		return $container;
 	}
 
 	/**
@@ -71,7 +92,6 @@ class Response extends \lithium\action\Response {
 	 */
 	public function delete() {
 		$pk = $this->_route->location;
-		$query = $this->_route->query;
 
 		$model = $this->__model();
 
