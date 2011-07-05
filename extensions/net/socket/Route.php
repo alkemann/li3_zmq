@@ -135,4 +135,32 @@ class Route extends \lithium\core\Object {
 		return $this;
 	}
 
+	public function generate(\lithium\data\model\Query $query, array $options = array()) {
+
+		$model = $options['model'];
+		$pk = $model::key();
+
+		$types = array('read'=>'get', 'create'=>'post', 'update'=>'put', 'delete'=>'delete');
+		$this->_type = $types[$query->type()];
+
+		$this->_resource = $model::meta('source');
+
+		if (isset($options['conditions'][$pk])) {
+			$this->_location = $options['conditions'][$pk];
+			unset($options['conditions'][$pk]);
+		}
+		if (isset($options['conditions'])) {
+			$this->_query = $options['conditions'];
+		}
+
+		// Extra logic on a per type basis
+		switch ($this->_type) {
+			case 'put':
+			case 'post':
+				$this->_post = $query->data();
+				break;
+		}
+		return $this;
+	}
+
 }

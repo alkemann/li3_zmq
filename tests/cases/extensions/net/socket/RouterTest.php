@@ -28,7 +28,20 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('type' => 'get', 'resource' => 'posts', 'location' => '11');
-		$result = Router::process('get/posts/11')->export();
+		$result = Router::parse('get/posts/11')->export();
+		$this->assertEqual($expected, $result);
+
+		Router::reset();
+		$query = new \lithium\data\model\Query(array(
+			'type'	=> 'read',
+			'model' => '\li3_zmq\tests\mocks\models\Post',
+		));
+		$options = array(
+			'model' => '\li3_zmq\tests\mocks\models\Post'
+		);
+
+		$expected = 'get/posts';
+		$result = Router::generate($query, $options)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
