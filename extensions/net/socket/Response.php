@@ -91,7 +91,9 @@ class Response extends \lithium\action\Response {
 
 
 		$model = $this->_model;
-		\lithium\core\Libraries::load($model);
+		if (!class_exists($model)) {
+			\lithium\core\Libraries::load($model);
+		}
 
 		if ($pk) {
 			$container = $this->container('Entity');
@@ -103,7 +105,9 @@ class Response extends \lithium\action\Response {
 			$finder = 'all';
 		}
 		$collection = $model::find($finder, compact('conditions'));
-		$container['data'] = $collection->to('array');
+		if ($collection !== null) {
+			$container['data'] = $collection->to('array');
+		}
 
 		if ($container['type'] == 'Collection') {
 			$container['count'] = $container['total'] = $collection->count();

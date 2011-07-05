@@ -16,7 +16,13 @@ namespace li3_zmq\extensions\data\source;
 class Zeromq extends \lithium\data\Source {
 
 	private $__context = null;
-	private $__defaults = array('protocol'=>'tcp','port'=>'5555','host'=>'localhost','socket'=>\ZMQ::SOCKET_REQ);
+	private $__defaults = array(
+		'protocol' => 'tcp',
+		'port' => '5555',
+		'host' => 'localhost',
+		'socket' => \ZMQ::SOCKET_REQ,
+		'model' => '\lithium\data\Model'
+	);
 	public $connection = null;
 	private $__connection = '';
 
@@ -56,9 +62,12 @@ class Zeromq extends \lithium\data\Source {
 		return $this->connection ? $this->__connection : 'Not connected';
 	}
 
+	public function model() {
+		return $this->_config['model'];
+	}
+
 	public function send($msgs) {
 		$this->connection->send($msgs);
-		return $this->connection->recv();
 	}
 
 	public function recv() {

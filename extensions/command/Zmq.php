@@ -29,11 +29,6 @@ class Zmq extends \lithium\console\Command {
 		$this->__context = new \ZMQContext();
 	}
 
-	public function tes() {
-		//$con = Connections::get('hub')->connect();
-		print_r($con);
-	}
-
 	/**
 	 * Start a service
 	 *
@@ -57,7 +52,8 @@ class Zmq extends \lithium\console\Command {
 		/** /candy **/
 
 		$port = $responder->connected_to('port');
-		$reply = $hub->send("register/$resource/$port");
+		$hub->send("register/$resource/$port");
+		$reply = $hub->recv();
 
 		if (json_decode($reply, true) !== true) {
 			$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
@@ -65,22 +61,22 @@ class Zmq extends \lithium\console\Command {
 			die();
 		}
 
-		$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
-		$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
-		$this->out(']', array('nl' => 2, 'style' => 'blue'));
-
 		while(true) {
+			$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
+			$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
+			$this->out(']', array('nl' => 1, 'style' => 'blue'));
+
 			$request = $responder->recv(); // Blocking
 			$this->out('Received request: [', array('nl' => 0 ,'style' => 'blue'));
 			$this->out($request,  array('nl' => 0 ,'style' => 'green'));
 			$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
 
 			$route = Router::process($request);
-			$response = new Response($route);
-			$result = $response->request();
+			$response = new Response($route, $responder->model());
+			$result = json_encode($response->request());
 
 			//  Send reply back to client
-			$responder->send(json_encode($result));
+			$responder->send($result);
 		}
 	}
 
@@ -101,7 +97,8 @@ class Zmq extends \lithium\console\Command {
 		$this->out($request_string, array('nl' => 0, 'style' => 'green'));
 		$this->out(']', array('nl' => 1, 'style' => 'blue'));
 
-		$reply = $hub->send($request_string);
+		$hub->send($request_string);
+		$reply = $hub->recv();
 
 		echo "\n";
 		print_r(json_decode($reply, true));
@@ -140,4 +137,5 @@ class Zmq extends \lithium\console\Command {
 		/** /candy **/
 		return $responder;
 	}
+
 }
