@@ -67,7 +67,7 @@ class Response extends \lithium\action\Response {
 
 		$model = $this->__model();
 
-		$conditions = array($model::meta('name') . '.id' => $pk); // @todo . $model->key());
+		$conditions = array($model::key() => $pk);
 		$entity = $model::find('first', compact('conditions'));
 
 		$container = $this->container('Entity');
@@ -95,7 +95,7 @@ class Response extends \lithium\action\Response {
 
 		$model = $this->__model();
 
-		$conditions = $query + array($model::meta('name') . '.id' => $pk); // @todo . $model->key());
+		$conditions = array($model::key() => $pk);
 		$entity = $model::find('first', compact('conditions'));
 
 		$container = $this->container('Entity');
@@ -147,7 +147,7 @@ class Response extends \lithium\action\Response {
 
 		if ($pk) {
 			$container = $this->container('Entity');
-			$conditions = $query + array($model::meta('name') . '.id' => $pk); // @todo . $model->key());
+			$conditions = $query + array($model::key() => $pk);
 			$finder = 'first';
 		} else {
 			$container = $this->container('Collection');
@@ -155,11 +155,11 @@ class Response extends \lithium\action\Response {
 			$finder = 'all';
 		}
 		$collection = $model::find($finder, compact('conditions'));
-		if ($collection !== null) {
+		if ($collection) {
 			$container['data'] = $collection->to('array');
 		}
 
-		if ($container['type'] == 'Collection') {
+		if ($collection && $container['type'] == 'Collection') {
 			$container['count'] = $container['total'] = $collection->count();
 		}
 
@@ -192,7 +192,7 @@ class Response extends \lithium\action\Response {
 			'data' => false
 		);
 		if ($type === 'Entity') {
-			$container['type'] = 'entity';
+			$container['type'] = 'Entity';
 		} else {
 			$container += array(
 				'count' => 0,
