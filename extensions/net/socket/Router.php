@@ -21,13 +21,8 @@ class Router extends \lithium\core\Object {
 		return static::$_route;
 	}
 
-	public static function process($request) {
-		return static::parse($request);
-	}
-
 	public static function parse($request) {
-		$route = static::get();
-		return $route->parse($request);
+		return static::get()->parse($request);
 	}
 
 	public static function reset() {
