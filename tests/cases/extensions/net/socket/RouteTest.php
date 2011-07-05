@@ -44,7 +44,7 @@ class RouteTest extends \lithium\test\Unit {
 		$expected = array('type' => 'get', 'resource' => 'posts', 'query' => array('admin' => '1'));
 		$result = $route->parse('get/posts?admin=1')->export();
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = array('type' => 'post', 'resource' => 'posts', 'post' => array('name' => 'ui'));
 		$result = $route->parse('post/posts/{"name":"ui"}')->export();
 		$this->assertEqual($expected, $result);
@@ -56,7 +56,7 @@ class RouteTest extends \lithium\test\Unit {
 
 	public function testToString() {
 		$route = new Route();
-		
+
 		foreach (array(
 				'get/posts/11',
 				'get/posts?admin=1',
