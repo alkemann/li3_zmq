@@ -78,6 +78,22 @@ class Response extends \lithium\action\Response {
 	 * @return array
 	 */
 	public function post() {
+		$post = $this->_route->post;
+
+		$model = $this->__model();
+
+		$container = $this->container('Entity');
+
+		$entity = $model::create($post);
+
+		if ($entity->validates()) {
+			$entity->save(null, array('validate' => false));
+			$container['data'] = $entity->to('array');
+		} else {
+			$container['errors'] = $entity->errors();
+		}
+
+		return $container;
 	}
 
 	/**
@@ -89,11 +105,7 @@ class Response extends \lithium\action\Response {
 		$pk = $this->_route->location;
 		$query = $this->_route->query;;
 
-
-		$model = $this->_model;
-		if (!class_exists($model)) {
-			\lithium\core\Libraries::load($model);
-		}
+		$model = $this->__model();
 
 		if ($pk) {
 			$container = $this->container('Entity');
@@ -116,6 +128,18 @@ class Response extends \lithium\action\Response {
 		return $container;
 	}
 
+	/**
+	 * Return the name of the model for Response, load if not already loaded
+	 *
+	 * @return string
+	 */
+	private function __model() {
+		$model = $this->_model;
+		if (!class_exists($model)) {
+			\lithium\core\Libraries::load($model);
+		}
+		return $model;
+	}
 	/**
 	 * Create a json container for data
 	 *
