@@ -146,23 +146,36 @@ class Response extends \lithium\action\Response {
 		$query = $this->_route->query;;
 
 		$model = $this->__model();
+		$key = $model::key();
 
 		if ($pk) {
 			$container = $this->container('Entity');
-			$conditions = $query + array($model::key() => $pk);
+			$conditions = $query + array($key => $pk);
 			$finder = 'first';
 		} else {
 			$container = $this->container('Collection');
 			$conditions = $query;
 			$finder = 'all';
 		}
-		$collection = $model::find($finder, compact('conditions'));
-		if ($collection) {
-			$container['data'] = $collection->to('array');
+		$result = $model::find($finder, compact('conditions'));
+		if ($result instanceof \lithium\data\Collection) {
+			/**
+			 * If the result is a collection, reduce it to array
+			 * and exchange the auto array keys for the primary
+			 * key of each record.
+			 */
+			$data = $result->map(function($e) use ($key) {
+				return array($e[$key] => $e);
+			})->to('array');
+			foreach ($data as $one) {
+				$container['data'][key($one)] = current($one);
+			}
+		} elseif ($result instanceof \lithium\data\Entity) {
+			$container['data'] = $result->to('array');
 		}
 
-		if ($collection && $container['type'] == 'Collection') {
-			$container['count'] = $container['total'] = $collection->count();
+		if ($result && $container['type'] == 'Collection') {
+			$container['count'] = $container['total'] = $result->count();
 		}
 
 		return $container;
