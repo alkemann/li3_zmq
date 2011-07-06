@@ -21,7 +21,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testGetOne() {
 		$response = new Response(Router::parse('get/posts/1'), '\li3_zmq\tests\mocks\models\Posts');
-		$expected = array('id' => 2, 'title' => 'Blue');
+		$expected = array('_id' => 2, 'title' => 'Blue');
 		$result = $response->request();
 		$this->assertEqual('Container', $result['name']);
 		$this->assertEqual('Entity', $result['type']);
@@ -40,7 +40,7 @@ class ResponseTest extends \lithium\test\Unit {
 	public function testPost() {
 		$response = new Response(Router::parse('post/posts/{"title":"tittelen"}'), '\li3_zmq\tests\mocks\models\Posts');
 		$result = $response->request();
-		$expected = array('id' => 4, 'title' => 'tittelen');
+		$expected = array('_id' => 4, 'title' => 'tittelen');
 		$this->assertEqual($expected, $result['data']);
 	}
 
@@ -55,14 +55,14 @@ class ResponseTest extends \lithium\test\Unit {
 	public function testPut() {
 		$response = new Response(Router::parse('put/posts/2/{"title":"EDIT"}'), '\li3_zmq\tests\mocks\models\Posts');
 		$result = $response->request();
-		$expected = array('id' => 2, 'title' => 'EDIT');
+		$expected = array('_id' => 2, 'title' => 'EDIT');
 		$this->assertEqual($expected, $result['data']);
 	}
 
 	public function testDelete() {
 		$response = new Response(Router::parse('delete/posts/2'), '\li3_zmq\tests\mocks\models\Posts');
 		$result = $response->request();
-		$expected = array('id' => 2, 'title' => 'Blue');
+		$expected = array('_id' => 2, 'title' => 'Blue');
 		$this->assertEqual($expected, $result['data']);
 	}
 

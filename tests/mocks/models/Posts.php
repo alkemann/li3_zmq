@@ -5,7 +5,7 @@ namespace li3_zmq\tests\mocks\models;
 class Posts extends \lithium\tests\mocks\data\MockBase {
 
 	protected $_meta = array(
-		'key' => 'id',
+		'key' => '_id',
 		'connection' => false,
 		'locked' => false
 	);
@@ -24,27 +24,27 @@ class Posts extends \lithium\tests\mocks\data\MockBase {
 	}
 
 	public static function first(array $options = array()) {
-		return new \lithium\data\entity\Record(array(
+		return new \lithium\data\entity\Document(array(
 			'model' => __CLASS__,
-			'data' => array('id' => 2, 'title' => 'Blue')
+			'data' => array('_id' => 2, 'title' => 'Blue')
 		));
 	}
 
 	public static function all(array $options = array()) {
-		return new \lithium\data\collection\RecordSet(array(
+		return new \lithium\data\collection\DocumentSet(array(
 			'model' => __CLASS__,
 			'data' => array(
-				11 => new \lithium\data\entity\Record(array(
+				0 => new \lithium\data\entity\Document(array(
 					'model' => __CLASS__,
-					'data' => array('id' => 11, 'title' => 'Name')
+					'data' => array('_id' => 11, 'title' => 'Name')
 				)),
-				12 => new \lithium\data\entity\Record(array(
+				1 => new \lithium\data\entity\Document(array(
 					'model' => __CLASS__,
-					'data' => array('id' => 12, 'title' => 'Blue')
+					'data' => array('_id' => 12, 'title' => 'Blue')
 				)),
-				13 => new \lithium\data\entity\Record(array(
+				2 => new \lithium\data\entity\Document(array(
 					'model' => __CLASS__,
-					'data' => array('id' => 13, 'title' => 'Mountain')
+					'data' => array('_id' => 13, 'title' => 'Mountain')
 				))
 			)
 		));
@@ -59,8 +59,9 @@ class Posts extends \lithium\tests\mocks\data\MockBase {
 	}
 
 	public function save($entity, $data = array(), array $options = array()) {
-		if (!isset($entity->id)) {
-			$entity->id = Posts::pk();
+		$pk = static::meta('key');
+		if (!isset($entity->$pk)) {
+			$entity->$pk = Posts::pk();
 		}
 		return true;
 	}

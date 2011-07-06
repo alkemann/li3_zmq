@@ -114,13 +114,13 @@ class RouteTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'read',
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'limit'      => 1
 		));
 		$options = array(
 			'limit' => 1,
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'model' => '\li3_zmq\tests\mocks\models\Posts'
 		);
 
@@ -134,13 +134,13 @@ class RouteTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'read',
-			'conditions' => array('id' => 2, 'public' => 0),
+			'conditions' => array('_id' => 2, 'public' => 0),
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'limit'      => 1
 		));
 		$options = array(
 			'limit' => 1,
-			'conditions' => array('id' => 2, 'public' => 0),
+			'conditions' => array('_id' => 2, 'public' => 0),
 			'model' => '\li3_zmq\tests\mocks\models\Posts'
 		);
 
@@ -171,14 +171,14 @@ class RouteTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'update',
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'limit'      => 1,
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'data'      => array('title' => 'Go updated', 'public' => 1)
 		));
 		$options = array(
 			'model' => '\li3_zmq\tests\mocks\models\Posts',
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'limit' => 1
 		);
 
@@ -192,13 +192,13 @@ class RouteTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'delete',
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'limit'      => 1,
 			'model'      => '\li3_zmq\tests\mocks\models\Posts'
 		));
 		$options = array(
 			'model' => '\li3_zmq\tests\mocks\models\Posts',
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'limit' => 1
 		);
 
@@ -212,13 +212,13 @@ class RouteTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'delete',
-			'conditions' => array('id' => 2, 'public' => 0),
+			'conditions' => array('_id' => 2, 'public' => 0),
 			'limit'      => 1,
 			'model'      => '\li3_zmq\tests\mocks\models\Posts'
 		));
 		$options = array(
 			'model' => '\li3_zmq\tests\mocks\models\Posts',
-			'conditions' => array('id' => 2, 'public' => 0),
+			'conditions' => array('_id' => 2, 'public' => 0),
 			'limit' => 1
 		);
 

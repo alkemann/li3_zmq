@@ -149,13 +149,13 @@ class ZeromqTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'read',
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'limit'      => 1
 		));
 		$options = array(
 			'limit' => 1,
-			'conditions' => array('id' => 2),
+			'conditions' => array('_id' => 2),
 			'model' => '\li3_zmq\tests\mocks\models\Posts'
 		);
 		$result = $con->read($query, $options);

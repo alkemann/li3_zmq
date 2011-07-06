@@ -160,14 +160,15 @@ class Response extends \lithium\action\Response {
 		$result = $model::find($finder, compact('conditions'));
 		if ($result instanceof \lithium\data\collection\RecordSet) {
 			$container['data'] = $result->to('array');
-		} elseif ($result instanceof \lithium\data\Collection) {
+		} elseif ($result instanceof \lithium\data\collection\DocumentSet) {
 			/**
 			 * If the result is a collection, reduce it to array
 			 * and exchange the auto array keys for the primary
 			 * key of each record.
 			 */
 			$data = $result->map(function($e) use ($key) {
-				return array($e[$key] => $e);
+				$array_key = (string) $e->$key;
+				return array($array_key => $e);
 			})->to('array');
 			foreach ($data as $one) {
 				$container['data'][key($one)] = current($one);
