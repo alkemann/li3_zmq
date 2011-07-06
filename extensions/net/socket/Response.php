@@ -212,8 +212,7 @@ class Response extends \lithium\action\Response {
 			$container += array(
 				'count' => 0,
 				'total' => 0,
-				'type' => 'Collection',
-				'data' => false
+				'type' => 'Collection'
 			);
 		}
 		return $container;
