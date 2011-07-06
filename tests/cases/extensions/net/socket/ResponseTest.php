@@ -1,4 +1,11 @@
 <?php
+/**
+ * Li3_Zmq - ZeroMQ plugin for Lithium
+ *
+ * @package       li3_zmq
+ * @copyright     Copyright 2011, Redpill-Linpro (http://redpill-linpro.com)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 namespace li3_zmq\tests\cases\extensions\net\socket;
 
@@ -7,6 +14,9 @@ use li3_zmq\extensions\net\socket\Response;
 use li3_zmq\extensions\net\socket\Router;
 use li3_zmq\tests\mocks\models\Posts;
 
+/**
+ * Test li3_zmq\extensions\net\socket\Response
+ */
 class ResponseTest extends \lithium\test\Unit {
 
 	public function testGetOne() {
