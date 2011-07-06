@@ -34,7 +34,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual('Container', $result['name']);
 		$this->assertEqual('Collection', $result['type']);
 		$this->assertEqual(3, $result['count']);
-		$this->assertEqual('Mountain', $result['data'][3]['title']);
+		$this->assertEqual('Mountain', $result['data'][13]['title']);
 	}
 
 	public function testPost() {

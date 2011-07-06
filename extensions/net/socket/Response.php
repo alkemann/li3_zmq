@@ -158,7 +158,9 @@ class Response extends \lithium\action\Response {
 			$finder = 'all';
 		}
 		$result = $model::find($finder, compact('conditions'));
-		if ($result instanceof \lithium\data\Collection) {
+		if ($result instanceof \lithium\data\collection\RecordSet) {
+			$container['data'] = $result->to('array');
+		} elseif ($result instanceof \lithium\data\Collection) {
 			/**
 			 * If the result is a collection, reduce it to array
 			 * and exchange the auto array keys for the primary

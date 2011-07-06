@@ -24,19 +24,28 @@ class Posts extends \lithium\tests\mocks\data\MockBase {
 	}
 
 	public static function first(array $options = array()) {
-		return new \lithium\data\entity\Document(array(
+		return new \lithium\data\entity\Record(array(
 			'model' => __CLASS__,
 			'data' => array('id' => 2, 'title' => 'Blue')
 		));
 	}
 
 	public static function all(array $options = array()) {
-		return new \lithium\data\collection\DocumentSet(array(
+		return new \lithium\data\collection\RecordSet(array(
 			'model' => __CLASS__,
 			'data' => array(
-				array('id' => 1, 'title' => 'Name'),
-				array('id' => 2, 'title' => 'Blue'),
-				array('id' => 3, 'title' => 'Mountain')
+				11 => new \lithium\data\entity\Record(array(
+					'model' => __CLASS__,
+					'data' => array('id' => 11, 'title' => 'Name')
+				)),
+				12 => new \lithium\data\entity\Record(array(
+					'model' => __CLASS__,
+					'data' => array('id' => 12, 'title' => 'Blue')
+				)),
+				13 => new \lithium\data\entity\Record(array(
+					'model' => __CLASS__,
+					'data' => array('id' => 13, 'title' => 'Mountain')
+				))
 			)
 		));
 	}
