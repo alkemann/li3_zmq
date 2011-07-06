@@ -80,4 +80,33 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = $response->merge($one,$two);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testContainerEntity(){
+		$response = new Response(Router::parse('get/posts'), '\li3_zmq\tests\mocks\models\Posts');
+		$expected = array(
+			'name' => 'Container',
+			'version' => 1,
+			'resource' => 'posts',
+			'data' => false,
+			'type' => 'Entity'
+		);
+		$result = $response->container('Entity');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testContainerCollection(){
+		$response = new Response(Router::parse('get/posts'), '\li3_zmq\tests\mocks\models\Posts');
+		$expected = array(
+			'name' => 'Container',
+			'version' => 1,
+			'resource' => 'posts',
+			'data' => false,
+			'count' => 0,
+			'total' => 0,
+			'type' => 'Collection'
+		);
+		$result = $response->container('Collection');
+		$this->assertEqual($expected, $result);
+	}
+
 }
