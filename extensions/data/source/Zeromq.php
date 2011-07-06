@@ -45,6 +45,11 @@ class Zeromq extends \lithium\data\Source {
 
 	private function __class($name) { return '\\'.$this->_classes[$name]; }
 
+	/**
+	 * Create a Socket connection to host specified in protocol. Auto called on construction
+	 *
+	 * @return Zeromq
+	 */
 	public function connect() {
 		$zmqClass = $this->__class('zmq');
 		$socketClass = $this->__class('socket');
@@ -68,6 +73,12 @@ class Zeromq extends \lithium\data\Source {
 		return $this;
 	}
 
+	/**
+	 * Get connection description or config of $key
+	 *
+	 * @param string $key
+	 * @return string
+	 */
 	public function connected_to($key = null) {
 		if ($key && $this->connection) {
 			return $this->_config[$key];
@@ -75,29 +86,62 @@ class Zeromq extends \lithium\data\Source {
 		return $this->connection ? $this->__connection : 'Not connected';
 	}
 
+	/**
+	 * Get the fully namespaced model name tied to this connection
+	 *
+	 * @return string
+	 */
 	public function model() {
 		return $this->_config['model'];
 	}
 
+	/**
+	 * Send $msgs over socket connection
+	 *
+	 * @param mixed $msgs
+	 */
 	public function send($msgs) {
 		$this->connection->send($msgs);
 	}
 
+	/**
+	 * Recieve from socket connection
+	 *
+	 * @return string
+	 */
 	public function recv() {
 		return $this->connection->recv();
 	}
 
+	/**
+	 * Throw away socket connection
+	 *
+	 * @return boolean
+	 */
 	public function disconnect() {
 		$this->connection = null;
 		$this->__connection = null;
 		return true;
 	}
 
+	/**
+	 * Ask connection for list of entities
+	 *
+	 * @param null $class
+	 * @return string
+	 */
 	public function sources($class = null) {
 		$this->connection->send('entities');
 		return $this->connection->recv();
 	}
 
+	/**
+	 * Describe $entity
+	 *
+	 * @param string $entity
+	 * @param array $meta
+	 * @return string
+	 */
 	public function describe($entity, array $meta = array()) {
 		$this->connection->send('describe/'.$entity);
 		return $this->connection->recv();
@@ -107,6 +151,13 @@ class Zeromq extends \lithium\data\Source {
 		throw new \Exception('Relationship: Not implemented for Zeromq datasource');
 	}
 
+	/**
+	 * Send a CREATE to Zmq connection, returns entity or false
+	 *
+	 * @param \lithium\data\model\Query $query
+	 * @param array $options
+	 * @return type
+	 */
 	public function create($query, array $options = array()) {
 		$request = Router::generate($query, $options);
 		$this->send($request->__toString(), $request->sendOptions());
@@ -114,6 +165,13 @@ class Zeromq extends \lithium\data\Source {
 		return $result;
 	}
 
+	/**
+	 * Send a READ to Zmq connection, returns entity or false
+	 *
+	 * @param \lithium\data\model\Query $query
+	 * @param array $options
+	 * @return type
+	 */
 	public function read($query, array $options = array()) {
 		$request = Router::generate($query, $options);
 		$this->send($request->__toString(), $request->sendOptions());
@@ -121,20 +179,32 @@ class Zeromq extends \lithium\data\Source {
 		return $result;
 	}
 
+	/**
+	 * Send a UPDATE to Zmq connection, returns entity or false
+	 *
+	 * @param \lithium\data\model\Query $query
+	 * @param array $options
+	 * @return type
+	 */
 	public function update($query, array $options = array()) {
 		$request = Router::generate($query, $options);
 		$this->send($request->__toString(), $request->sendOptions());
 		$result = $this->recv();
 		return $result;
-
 	}
 
+	/**
+	 * Send a DELETE to Zmq connection, returns entity or false
+	 *
+	 * @param \lithium\data\model\Query $query
+	 * @param array $options
+	 * @return type
+	 */
 	public function delete($query, array $options = array()) {
 		$request = Router::generate($query, $options);
 		$this->send($request->__toString(), $request->sendOptions());
 		$result = $this->recv();
 		return $result;
-
 	}
 
 }
