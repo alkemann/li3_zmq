@@ -71,7 +71,7 @@ class Zmq extends \lithium\console\Command {
 			$this->out($request,  array('nl' => 0 ,'style' => 'green'));
 			$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
 
-			$route = Router::process($request);
+			$route = Router::parse($request);
 			$response = new Response($route, $responder->model());
 			$result = json_encode($response->request());
 
