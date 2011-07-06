@@ -9,6 +9,8 @@
 
 namespace li3_zmq\extensions\net\socket;
 
+use lithium\util\Set;
+
 /**
  * Hold and prepare response
  */
@@ -215,7 +217,14 @@ class Response extends \lithium\action\Response {
 		$ret = $one;
 		$ret['count'] += $two['count'];
 		$ret['total'] += $two['total'];
-		$ret['data'] += $two['data'];
+		if (is_array($one['data'])) {
+			if (is_array($two['data'])) {
+				$ret['data'] += Set::merge($one['data'],$two['data']);
+			} // else $ret['data'] = $one['data'];
+		} else {
+			// either two is the only array, or two is also false
+			$ret['data'] = $two['data'];
+		}
 		return $ret;
 	}
 

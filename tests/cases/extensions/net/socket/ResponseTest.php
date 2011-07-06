@@ -56,4 +56,18 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['data']);
 	}
 
+	public function testMerge() {
+		$response = new Response(Router::parse('get/posts'), '\li3_zmq\tests\mocks\models\Posts');
+		$one = array('count' => 2, 'total' => 3, 'data' => false);
+		$two = array('count' => 3, 'total' => 4, 'data' => false);
+		$expected = array('count' => 5, 'total' => 7, 'data' => false);
+		$result = $response->merge($one,$two);
+		$this->assertEqual($expected, $result);
+
+		$one = array('count' => 2, 'total' => 3, 'data' => array('one', 'two'));
+		$two = array('count' => 3, 'total' => 4, 'data' => array('three', 'four'));
+		$expected = array('count' => 5, 'total' => 7, 'data' => array('one', 'two', 'three', 'four'));
+		$result = $response->merge($one,$two);
+		$this->assertEqual($expected, $result);
+	}
 }
