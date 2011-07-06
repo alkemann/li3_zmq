@@ -19,6 +19,7 @@ class Zeromq extends \lithium\data\Source {
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Document',
 		'set' => 'lithium\data\collection\DocumentSet',
+		'result' => 'li3_zmq\extensions\data\source\zeromq\Result',
 		'context' => 'ZMQContext',
 		'socket' => 'ZMQSocket',
 		'zmq' => 'ZMQ'
@@ -175,8 +176,16 @@ class Zeromq extends \lithium\data\Source {
 	public function read($query, array $options = array()) {
 		$request = Router::generate($query, $options);
 		$this->send($request->__toString(), $request->sendOptions());
-		$result = $this->recv();
-		return $result;
+		$resultClass = $this->__class('result');
+		$result = new $resultClass(array('resource' => $this->recv()));
+		$data = $result->data();
+		if ($result->type() == 'Entity') {
+			$opts = array('class' => 'entity', 'exists' => true);
+			return $this->item($query->model(), $data, $opts);
+		}
+		$stats = $result->stats();
+		$opts = compact('stats') + array('class' => 'set', 'exists' => true);
+		return $this->item($query->model(), $data, $opts);
 	}
 
 	/**

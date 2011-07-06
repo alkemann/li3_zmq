@@ -19,6 +19,7 @@ use li3_zmq\tests\mocks\zmq\MockZMQ;
 class ZeromqTest extends \lithium\test\Unit {
 
 	private $__classes = array(
+		'result' => 'li3_zmq\tests\mocks\zmq\MockResult',
 		'context' => 'li3_zmq\tests\mocks\zmq\MockContext',
 		'socket' =>  'li3_zmq\tests\mocks\zmq\MockSocket',
 		'zmq' => 'li3_zmq\tests\mocks\zmq\MockZMQ'
@@ -29,6 +30,13 @@ class ZeromqTest extends \lithium\test\Unit {
 			'type' => 'Zeromq',
 			'model' => '\li3_zmq\tests\mocks\models\Posts',
 			'classes' => $this->__classes
+		));
+		Connections::add('zmq-test-entity', array(
+			'type' => 'Zeromq',
+			'model' => '\li3_zmq\tests\mocks\models\Posts',
+			'classes' => array(
+				'result' => 'li3_zmq\tests\mocks\zmq\MockEntityResult',
+			) + $this->__classes
 		));
 	}
 
@@ -142,10 +150,8 @@ class ZeromqTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testRead() {
-		$con = Connections::get('zmq-test');
-
-		$expected = 'get/posts/2';
+	public function testReadFirst() {
+		$con = Connections::get('zmq-test-entity');
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'read',
@@ -159,6 +165,24 @@ class ZeromqTest extends \lithium\test\Unit {
 			'model' => '\li3_zmq\tests\mocks\models\Posts'
 		);
 		$result = $con->read($query, $options);
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result instanceof \lithium\data\Entity);
+		$expected = 'get/posts/2';
+		$this->assertEqual($expected, $result->request);
+	}
+
+	public function testReadAll() {
+		$con = Connections::get('zmq-test');
+
+		$query = new \lithium\data\model\Query(array(
+			'type'       => 'read',
+			'model'      => '\li3_zmq\tests\mocks\models\Posts',
+		));
+		$options = array(
+			'model' => '\li3_zmq\tests\mocks\models\Posts'
+		);
+		$result = $con->read($query, $options);
+		$this->assertTrue($result instanceof \lithium\data\Collection);
+		$expected = 'get/posts';
+		$this->assertEqual($expected, $result->stats('request'));
 	}
 }
