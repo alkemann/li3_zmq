@@ -34,10 +34,10 @@ class RouterTest extends \lithium\test\Unit {
 		Router::reset();
 		$query = new \lithium\data\model\Query(array(
 			'type'	=> 'read',
-			'model' => '\li3_zmq\tests\mocks\models\Post',
+			'model' => '\li3_zmq\tests\mocks\models\Posts',
 		));
 		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Post'
+			'model' => '\li3_zmq\tests\mocks\models\Posts'
 		);
 
 		$expected = 'get/posts';
