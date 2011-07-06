@@ -24,6 +24,8 @@ class Route extends \lithium\core\Object {
 	protected $_resource = '';
 	// array
 	protected $_post = null;
+	// mixed
+	protected $_send_options = null;
 
 	/**
 	 * Export this object as an array
@@ -60,6 +62,15 @@ class Route extends \lithium\core\Object {
 		$ret = implode('/', array_values($arr));
 		$ret .= $string;
 		return $ret;
+	}
+
+	/**
+	 * Get any option to be sent as 2nd param to ZMQSocet::send()
+	 *
+	 * @return mixed
+	 */
+	public function sendOptions() {
+		return $this->_send_options;
 	}
 
 	/**
