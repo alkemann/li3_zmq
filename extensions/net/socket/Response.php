@@ -14,7 +14,7 @@ use lithium\util\Set;
 /**
  * Hold and prepare response
  */
-class Response extends \lithium\action\Response {
+class Response extends \lithium\core\Object {
 
 	protected $_route;
 	protected $_model;
