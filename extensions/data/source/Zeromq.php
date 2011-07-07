@@ -44,7 +44,7 @@ class Zeromq extends \lithium\data\Source {
 		parent::__construct($config + $this->__defaults + array('socket' => $default_socket));
 	}
 
-	private function __class($name) { return '\\'.$this->_classes[$name]; }
+	protected function __class($name) { return '\\'.$this->_classes[$name]; }
 
 	/**
 	 * Create a Socket connection to host specified in protocol. Auto called on construction
@@ -171,21 +171,45 @@ class Zeromq extends \lithium\data\Source {
 	 *
 	 * @param \lithium\data\model\Query $query
 	 * @param array $options
-	 * @return type
+	 * @return mixed
+	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$request = Router::generate($query, $options);
-		$this->send($request->__toString(), $request->sendOptions());
-		$resultClass = $this->__class('result');
-		$result = new $resultClass(array('resource' => $this->recv()));
-		$data = $result->data();
-		if ($result->type() == 'Entity') {
-			$opts = array('class' => 'entity', 'exists' => true);
-			return $this->item($query->model(), $data, $opts);
-		}
-		$stats = $result->stats();
-		$opts = compact('stats') + array('class' => 'set', 'exists' => true);
-		return $this->item($query->model(), $data, $opts);
+		$params = compact('query', 'options');
+		$config = $this->_config;
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config) {
+			$query = $params['query'];
+			$options = $params['options'];
+
+			// Generate a Route object based on the query
+			$request = Router::generate($query, $options);
+
+			// Send 0MQ request
+			$self->send($request->__toString(), $request->sendOptions());
+
+			// Recieve 0MQ response
+			$response = $self->recv();
+
+			$resultClass = $self->invokeMethod('__class', array('result'));
+			$result = new $resultClass(array('resource' => $response));
+
+			// Get the data array out of the container result
+			$data = $result->data();
+
+			if ($result->type() == 'Entity') {
+				if (empty($data)) {
+					return null;
+				}
+				$opts = array('class' => 'entity', 'exists' => true);
+				return $self->item($query->model(), $data, $opts);
+			}
+
+			// Grab any meta data from container result
+			$stats = $result->stats();
+
+			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
+			return $self->item($query->model(), $data, $opts);
+		});
 	}
 
 	/**
