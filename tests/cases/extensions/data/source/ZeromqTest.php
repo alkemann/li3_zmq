@@ -182,4 +182,21 @@ class ZeromqTest extends \lithium\test\Unit {
 		$expected = 'get/posts';
 		$this->assertEqual($expected, $result->stats('request'));
 	}
+
+	public function testCreate() {
+		$con = Connections::get('zmq-test-entity');
+
+		$query = new \lithium\data\model\Query(array(
+			'type'       => 'create',
+			'model'      => '\li3_zmq\tests\mocks\models\Posts',
+			'data'      => array('title' => 'Go there', 'public' => 0)
+		));
+
+		$result = $con->create($query);
+		$this->assertTrue($result instanceof \lithium\data\Entity);
+		$this->assertTrue($result->exists());
+		$expected = 'post/posts/{"title":"Go there","public":0}';
+		$this->assertEqual($expected, $result->request);
+	}
+
 }

@@ -67,4 +67,8 @@ class Result extends \lithium\core\Object implements \Iterator {
 		return $this->_resource['type'];
 	}
 
+	public function errors() {
+		return isset($this->_resource['errors']) ? $this->_resource['errors'] : array();
+	}
+
 }
