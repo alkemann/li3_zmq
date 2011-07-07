@@ -70,9 +70,13 @@ class Zmq extends \lithium\console\Command {
 	 * @param string $host localhost
 	 * @param string $connection tcp
 	 */
-	public function service($resource = 'users') {
+	public function service($resource = null) {
+		if ($resource === null) {
+			$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
+			die();
+		}
 
-		$hub = $this->__hub();
+		$hub = $this->$this->__responder('hub');
 
 		$responder = $this->__responder($resource);
 
@@ -138,22 +142,6 @@ class Zmq extends \lithium\console\Command {
 		echo "\n";
 	}
 
-	private function __hub() {
-		$hub = Connections::get('hub');
-
-		/** candy **/
-		if ($hub === null) {
-			$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
-			$this->out('Create a connection called "',array('nl' => 0, 'style' => 'blue'));
-			$this->out('hub',array('nl' => 0, 'style' => 'green'));
-			$this->out('" in ',array('nl' => 0, 'style' => 'blue'));
-			$this->out('/app/config/bootstrap/connections.php',array('nl' => 2, 'style' => 'green'));
-			die();
-		}
-
-		/** /candy **/
-		return $hub;
-	}
 	/**
 	 * Get the connection called $resource
 	 *
