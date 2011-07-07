@@ -200,4 +200,32 @@ class ZeromqTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result->request);
 	}
 
+	public function testDelete() {
+		$con = Connections::get('zmq-test-entity');
+
+		$query = new Query(array(
+			'type'       => 'delete',
+			'model'      => '\li3_zmq\tests\mocks\models\Posts',
+			'conditions' => array('_id' => 12)
+		));
+		$options = array('conditions' => array('_id' => 12));
+
+		$result = $con->delete($query, $options);
+		$this->assertIdentical(true, $result);
+	}
+
+	public function testDeleteFail() {
+		$con = Connections::get('zmq-test-entity');
+
+		$query = new Query(array(
+			'type'       => 'delete',
+			'model'      => '\li3_zmq\tests\mocks\models\Posts',
+			'conditions' => array('_id' => 14)
+		));
+		$options = array('conditions' => array('_id' => 14));
+
+		$result = $con->delete($query, $options);
+		$this->assertIdentical(false, $result);
+	}
+
 }

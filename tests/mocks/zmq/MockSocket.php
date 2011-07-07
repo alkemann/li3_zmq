@@ -14,6 +14,11 @@ namespace li3_zmq\tests\mocks\zmq;
  */
 class MockSocket {
 
+	private $__custom = array(
+		'delete/posts/12' => 'true',
+		'delete/posts/14' => 'false',
+	);
+
 	public function connect($adr) {
 		$this->connected_to = $adr;
 		return true;
@@ -31,6 +36,6 @@ class MockSocket {
 	public function recv() {
 		$msg = $this->msg;
 		unset($this->msg);
-		return $msg;
+		return isset($this->__custom[$msg]) ? $this->__custom[$msg] : $msg;
 	}
 }

@@ -260,10 +260,23 @@ class Zeromq extends \lithium\data\Source {
 	 * @return type
 	 */
 	public function delete($query, array $options = array()) {
-		$request = Router::generate($query, $options);
-		$this->send($request->__toString(), $request->sendOptions());
-		$result = $this->recv();
-		return $result;
+		$options += array('model' => $query->model());
+		$params = compact('query', 'options');
+		$config = $this->_config;
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config) {
+			$query = $params['query'];
+			$options = $params['options'];
+
+			$request = Router::generate($query, $options);
+
+			// Send delete request over 0MQ
+			$self->send($request->__toString(), $request->sendOptions());
+
+			// Return response from 0MQ - expecting 'true' or 'false'
+			$response = $self->recv();
+
+			return json_decode($response);
+		});
 	}
 
 }
