@@ -147,8 +147,7 @@ class Route extends \lithium\core\Object {
 	}
 
 	public function generate(\lithium\data\model\Query $query, array $options = array()) {
-
-		$model = $options['model'];
+		$model = $query->model();
 		$pk = $model::key();
 
 		$types = array('read'=>'get', 'create'=>'post', 'update'=>'put', 'delete'=>'delete');
@@ -156,13 +155,16 @@ class Route extends \lithium\core\Object {
 
 		$this->_resource = $model::meta('source');
 
-		if (isset($options['conditions'][$pk])) {
-			$this->_location = $options['conditions'][$pk];
-			unset($options['conditions'][$pk]);
-		}
+		$conditions = $query->conditions() ?: array();
 		if (isset($options['conditions'])) {
-			$this->_query = $options['conditions'];
+			$conditions = \lithium\util\Set::merge($conditions, $options['conditions']);
 		}
+
+		if (isset($conditions[$pk])) {
+			$this->_location = $conditions[$pk];
+			unset($conditions[$pk]);
+		}
+		$this->_query = $conditions;
 
 		// Extra logic on a per type basis
 		switch ($this->_type) {

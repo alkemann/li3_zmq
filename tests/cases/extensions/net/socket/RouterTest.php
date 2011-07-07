@@ -36,12 +36,9 @@ class RouterTest extends \lithium\test\Unit {
 			'type'	=> 'read',
 			'model' => '\li3_zmq\tests\mocks\models\Posts',
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
-		);
 
 		$expected = 'get/posts';
-		$result = Router::generate($query, $options)->__toString();
+		$result = Router::generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 

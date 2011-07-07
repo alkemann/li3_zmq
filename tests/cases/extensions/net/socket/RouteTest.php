@@ -82,12 +82,8 @@ class RouteTest extends \lithium\test\Unit {
 			'type'	=> 'read',
 			'model' => '\li3_zmq\tests\mocks\models\Posts',
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
-		);
-
 		$expected = 'get/posts';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -99,13 +95,8 @@ class RouteTest extends \lithium\test\Unit {
 			'conditions' => array('public' => 1),
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 		));
-		$options = array(
-			'conditions' => array('public' => 1),
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
-		);
-
 		$expected = 'get/posts?public=1';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -115,17 +106,10 @@ class RouteTest extends \lithium\test\Unit {
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'read',
 			'conditions' => array('_id' => 2),
-			'model'      => '\li3_zmq\tests\mocks\models\Posts',
-			'limit'      => 1
+			'model'      => '\li3_zmq\tests\mocks\models\Posts'
 		));
-		$options = array(
-			'limit' => 1,
-			'conditions' => array('_id' => 2),
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
-		);
-
 		$expected = 'get/posts/2';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -134,14 +118,10 @@ class RouteTest extends \lithium\test\Unit {
 
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'read',
-			'conditions' => array('_id' => 2, 'public' => 0),
-			'model'      => '\li3_zmq\tests\mocks\models\Posts',
-			'limit'      => 1
+			'model'      => '\li3_zmq\tests\mocks\models\Posts'
 		));
 		$options = array(
-			'limit' => 1,
-			'conditions' => array('_id' => 2, 'public' => 0),
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
+			'conditions' => array('_id' => 2, 'public' => 0)
 		);
 
 		$expected = 'get/posts/2?public=0';
@@ -157,12 +137,8 @@ class RouteTest extends \lithium\test\Unit {
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'data'      => array('title' => 'Go there', 'public' => 0)
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
-		);
-
 		$expected = 'post/posts/{"title":"Go there","public":0}';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -176,14 +152,8 @@ class RouteTest extends \lithium\test\Unit {
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'data'      => array('title' => 'Go updated', 'public' => 1)
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts',
-			'conditions' => array('_id' => 2),
-			'limit' => 1
-		);
-
 		$expected = 'put/posts/2/{"title":"Go updated","public":1}';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -193,17 +163,11 @@ class RouteTest extends \lithium\test\Unit {
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'delete',
 			'conditions' => array('_id' => 2),
-			'limit'      => 1,
 			'model'      => '\li3_zmq\tests\mocks\models\Posts'
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts',
-			'conditions' => array('_id' => 2),
-			'limit' => 1
-		);
 
 		$expected = 'delete/posts/2';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -213,17 +177,11 @@ class RouteTest extends \lithium\test\Unit {
 		$query = new \lithium\data\model\Query(array(
 			'type'       => 'delete',
 			'conditions' => array('_id' => 2, 'public' => 0),
-			'limit'      => 1,
 			'model'      => '\li3_zmq\tests\mocks\models\Posts'
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts',
-			'conditions' => array('_id' => 2, 'public' => 0),
-			'limit' => 1
-		);
 
 		$expected = 'delete/posts/2?public=0';
-		$result = $route->generate($query, $options)->__toString();
+		$result = $route->generate($query)->__toString();
 		$this->assertEqual($expected, $result);
 	}
 
