@@ -12,6 +12,7 @@ namespace li3_zmq\tests\cases\extensions\data\source;
 use li3_zmq\extensions\data\source\Zeromq;
 use lithium\data\Connections;
 use li3_zmq\tests\mocks\zmq\MockZMQ;
+use lithium\data\model\Query;
 
 /**
  * Test li3_zmq\extensions\data\source\Zeromq
@@ -153,7 +154,7 @@ class ZeromqTest extends \lithium\test\Unit {
 	public function testReadFirst() {
 		$con = Connections::get('zmq-test-entity');
 
-		$query = new \lithium\data\model\Query(array(
+		$query = new Query(array(
 			'type'       => 'read',
 			'conditions' => array('_id' => 2),
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
@@ -173,7 +174,7 @@ class ZeromqTest extends \lithium\test\Unit {
 	public function testReadAll() {
 		$con = Connections::get('zmq-test');
 
-		$query = new \lithium\data\model\Query(array(
+		$query = new Query(array(
 			'type'       => 'read',
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 		));
@@ -186,7 +187,7 @@ class ZeromqTest extends \lithium\test\Unit {
 	public function testCreate() {
 		$con = Connections::get('zmq-test-entity');
 
-		$query = new \lithium\data\model\Query(array(
+		$query = new Query(array(
 			'type'       => 'create',
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 			'data'      => array('title' => 'Go there', 'public' => 0)
