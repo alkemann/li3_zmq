@@ -1,0 +1,46 @@
+### Li3_ZMQ - Lithium meets 0MQ
+
+Use ZeroMQ as datasource for Lithium models to access remote data.
+
+Run console commands for running the app as a 0mq resource provider or
+access the 0mq network with the client command!
+
+---
+
+#### Classes
+
+##### [Zmq.php](li3_zmq/extensions/command/Zmq)
+Console commands
+
+##### [Zeromq.php](li3_zmq/extensions/data/source/Zeromq)
+Data source
+
+##### [Result.php](li3_zmq/extensions/data/source/zeromq/Result)
+Result for parsing 0mq responses
+
+##### [Response.php](li3_zmq/extensions/net/socket/Response)
+Hold and prepare response
+
+##### [Route.php](li3_zmq/extensions/net/socket/Route)
+Parse or generate 0mq requests
+
+##### [Router.php](li3_zmq/extensions/net/socket/Router)
+Static class to access or generate Routes
+
+---
+
+#### Tests
+
+[Run All Li3_ZMQ Tests](/test/li3_zmq)
+
+##### [ZeromqTest.php](li3_zmq/tests/cases/extensions/data/source/ZeromqTest)
+[Run Test](/test/li3_zmq/tests/cases/extensions/data/source/ZeromqTest)
+
+##### [ResponseTest.php](li3_zmq/tests/cases/extensions/net/socket/ResponseTest)
+[Run Test](/test/li3_zmq/tests/cases/extensions/net/socket/ResponseTest)
+
+##### [RouteTest.php](li3_zmq/tests/cases/extensions/net/socket/RouteTest)
+[Run Test](/test/li3_zmq/tests/cases/extensions/net/socket/RouteTest)
+
+##### [RouterTest.php](li3_zmq/tests/cases/extensions/net/socket/RouterTest)
+[Run Test](/test/li3_zmq/tests/cases/extensions/net/socket/RouterTest)

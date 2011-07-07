@@ -11,6 +11,42 @@ namespace li3_zmq\extensions\net\socket;
 
 /**
  * Represent and analyze the request strings of ZeroMQ messages
+ *
+ * Create or analyze ZeroMQ requests with this class. It sses a string only, RESTful like api:
+ *
+ * ### Format
+ * &lt;type>/&lt;resource/&lt;location>/&lt;post>?&lt;query>
+ *
+ * ### Examples
+ * - get/users
+ * - get/posts/12
+ * - get/users?admin=1
+ * - post/users/{"username":"alkemann","email":"alek@example.org","admin":0}
+ * - put/users/5/{"admin":1}
+ * - delete/comments/43
+ *
+ * ### Glosary
+ *
+ * #### type
+ * ##### Type of request
+ * Examples: `get`,`post`,`put`,`delete`,`register`,`ping`
+ *
+ * #### resource
+ * ##### Name of resource, lowercase and plural
+ * Examples: `/users`,`/posts`,`/comments`
+ *
+ * #### location
+ * ##### Primary key of resource
+ * Examples: `/12`, `/asd93khdfjsh3jjsdf2`
+ *
+ * #### post
+ * ##### Post data, payload of PUT and POST, json format
+ * Example: `/{"Title":"News","public":1}`
+ *
+ * #### query
+ * ##### Key,value pairs of request conditions
+ * Examples: `?admin=0`, `?username=alek&admin=0`
+ *
  */
 class Route extends \lithium\core\Object {
 
@@ -85,17 +121,10 @@ class Route extends \lithium\core\Object {
 		}
 	}
 
-	/**
-	 *
-	 * @param array $options
-	 * @param object $context
-	 */
 	public function match(array $options = array(), $context = null) {
-
 	}
 
 	public function compile() {
-
 	}
 
 	/**
@@ -146,6 +175,13 @@ class Route extends \lithium\core\Object {
 		return $this;
 	}
 
+	/**
+	 * Configure the class based on a Query, as from the ZeroMQ data source
+	 *
+	 * @param \lithium\data\model\Query $query
+	 * @param array $options
+	 * @return Route
+	 */
 	public function generate(\lithium\data\model\Query $query, array $options = array()) {
 		$model = $query->model();
 		$pk = $model::key();

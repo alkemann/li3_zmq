@@ -15,6 +15,39 @@ use lithium\data\Connections;
 
 /**
  * Start or test ZeroMQ sockets and services
+ *
+ * Create at least two connections in `app/config/boostrap/connections.php` : 
+ * {{{
+ *  //One called `hub` for the message broker
+ *	Connections::add('hub', array(
+ *		'type'		=> 'Zeromq',
+ *		'protocol'	=> 'tcp',
+ *		'port'		=> '5555',
+ *		'host'		=> 'localhost',
+ *		'socket'	=> \ZMQ::SOCKET_REQ
+ *	));
+ *
+ *  // And one per Model you wish to serve
+ *	Connections::add('users', array(
+ *		'type'		=> 'Zeromq',
+ *		'protocol'	=> 'tcp',
+ *		'port'		=> '5556',
+ *		'host'		=> '*',
+ *		'socket'	=> \ZMQ::SOCKET_REP,
+ *		'model'		=> '\app\models\Users'
+ *	));
+ *
+ * }}}
+ *
+ * You then can start your broker (for example the provided `hub.php`) and
+ * `li3 zmq service users` in any order. They should echo out their connectivity.
+ *
+ * At this point you can access the service from a third location (or just the same app), using
+ * the client command (requires only the `hub` connection) with `li3 zmq client get/users`
+ *
+ * The different client commands are documented by the Route class
+ *
+ * @see li3_zmq\extensions\net\socket\Route
  */
 class Zmq extends \lithium\console\Command {
 
@@ -121,7 +154,12 @@ class Zmq extends \lithium\console\Command {
 		/** /candy **/
 		return $hub;
 	}
-
+	/**
+	 * Get the connection called $resource
+	 *
+	 * @param string $resource
+	 * @return \li3_zmq\extensions\data\source\Zeromq 
+	 */
 	private function __responder($resource) {
 		$responder = Connections::get($resource);
 
