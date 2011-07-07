@@ -31,6 +31,7 @@ class Router extends \lithium\core\Object {
 	}
 
 	public static function generate($query, $options) {
+		static::reset();
 		return static::get()->generate($query, $options);
 	}
 }
