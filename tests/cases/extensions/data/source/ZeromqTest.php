@@ -177,10 +177,7 @@ class ZeromqTest extends \lithium\test\Unit {
 			'type'       => 'read',
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 		));
-		$options = array(
-			'model' => '\li3_zmq\tests\mocks\models\Posts'
-		);
-		$result = $con->read($query, $options);
+		$result = $con->read($query);
 		$this->assertTrue($result instanceof \lithium\data\Collection);
 		$expected = 'get/posts';
 		$this->assertEqual($expected, $result->stats('request'));
