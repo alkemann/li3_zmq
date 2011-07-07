@@ -228,4 +228,21 @@ class ZeromqTest extends \lithium\test\Unit {
 		$this->assertIdentical(false, $result);
 	}
 
+	public function testUpdate() {
+		$con = Connections::get('zmq-test-entity');
+
+		$query = new Query(array(
+			'type'       => 'update',
+			'model'      => '\li3_zmq\tests\mocks\models\Posts',
+			'data'      => array('public' => 1),
+			'conditions' => array('_id' => 12)
+		));
+		$options = array('conditions' => array('_id' => 12));
+		$result = $con->update($query, $options);
+		$this->assertTrue($result instanceof \lithium\data\Entity);
+		$this->assertTrue($result->exists());
+		$expected = 'put/posts/12/{"public":1}';
+		$this->assertEqual($expected, $result->request);
+	}
+
 }

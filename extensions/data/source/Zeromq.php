@@ -246,10 +246,34 @@ class Zeromq extends \lithium\data\Source {
 	 * @return type
 	 */
 	public function update($query, array $options = array()) {
-		$request = Router::generate($query, $options);
-		$this->send($request->__toString(), $request->sendOptions());
-		$result = $this->recv();
-		return $result;
+		$options += array('model' => $query->model());
+		$params = compact('query', 'options');
+		$config = $this->_config;
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config) {
+			$query = $params['query'];
+			$options = $params['options'];
+
+			// Generate a request and send it to 0mq
+			$request = Router::generate($query, $options);
+			$self->send($request->__toString(), $request->sendOptions());
+
+			// Recieve response from 0MQ
+			$response = $self->recv();
+
+			// Generate result from response
+			$resultClass = $self->invokeMethod('__class', array('result'));
+			$result = new $resultClass(array('resource' => $response));
+
+			$data = $result->data();
+			$errors = $result->errors();
+
+			if (empty($data) && empty($errors)) {
+				return false;
+			}
+
+			$opts = array('class' => 'entity', 'exists' => true, 'errors' => $errors);
+			return $self->item($query->model(), $data, $opts);
+		});
 	}
 
 	/**
