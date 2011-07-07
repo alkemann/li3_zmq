@@ -1,0 +1,3 @@
+[submodule "libraries/zeromq_poc"]
+	path = libraries/zeromq_poc
+	url = https://git.gitorious.org/guicloud/zeromq_poc.git
