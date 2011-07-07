@@ -175,6 +175,7 @@ class Zeromq extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
+		$options += array('model' => $query->model());
 		$params = compact('query', 'options');
 		$config = $this->_config;
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config) {
