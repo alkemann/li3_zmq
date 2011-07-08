@@ -39,21 +39,27 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function request() {
-		switch ($this->_route->type) {
-			case 'put':
-				return $this->put();
-				break;
-			case 'delete':
-				return $this->delete();
-				break;
-			case 'post':
-				return $this->post();
-				break;
-			case 'get':
-				return $this->get();
-				break;
-			default:
-				throw new \Exception('Method doesnt exist');
+		try {
+			switch ($this->_route->type) {
+				case 'put':
+					return $this->put();
+					break;
+				case 'delete':
+					return $this->delete();
+					break;
+				case 'post':
+					return $this->post();
+					break;
+				case 'get':
+					return $this->get();
+					break;
+				default:
+					throw new \Exception('Method doesnt exist');
+			}
+		} catch(\Exception $e) {
+			$c = $this->container();
+			$c['errors'] = $e->getMessage();
+			return $c;
 		}
 	}
 

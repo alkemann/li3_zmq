@@ -61,15 +61,20 @@ class Zeromq extends \lithium\data\Source {
 				$this->_config['host'].
 				':'.
 				$this->_config['port'];
-		switch ($this->_config['socket']) {
-			case $zmqClass::SOCKET_REQ:
-				$this->connection->connect($this->__connection);
-				break;
-			case $zmqClass::SOCKET_REP:
-				$this->connection->bind($this->__connection);
-				break;
-			default:
-				die('no socket connection set');
+		try {
+			switch ($this->_config['socket']) {
+				case $zmqClass::SOCKET_REQ:
+					$this->connection->connect($this->__connection);
+					break;
+				case $zmqClass::SOCKET_REP:
+					$this->connection->bind($this->__connection);
+					break;
+				default:
+					die('no socket connection set');
+			}
+		} catch(\ZMQSocketException $e) {
+			throw new \ZMQSocketException($this->__connection . ' already in use', 98);
+			die();
 		}
 		return $this;
 	}
@@ -103,6 +108,7 @@ class Zeromq extends \lithium\data\Source {
 	 */
 	public function send($msgs) {
 		$this->connection->send($msgs);
+		return $this;
 	}
 
 	/**
@@ -144,6 +150,7 @@ class Zeromq extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function describe($entity, array $meta = array()) {
+		return array();
 		$this->connection->send('describe/'.$entity);
 		return $this->connection->recv();
 	}
