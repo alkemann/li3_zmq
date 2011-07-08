@@ -45,6 +45,9 @@ use lithium\data\Connections;
  * At this point you can access the service from a third location (or just the same app), using
  * the client command (requires only the `hub` connection) with `li3 zmq client get/users`
  *
+ * Important note: When using a query with multiple parameters, you must use quote the request
+ * such `li3 zmq client "get/users?username=defaultuser&password=abd008dda1e0b78125d11f0ed054710f"`.
+ *
  * The different client commands are documented by the Route class
  *
  * @see li3_zmq\extensions\net\socket\Route

@@ -185,4 +185,17 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testQueries() {
+		$route = new Route();
+
+		$route->parse('get/users?username=alek');
+		$expected = array('username' => 'alek');
+		$result = $route->query;
+		$this->assertEqual($expected, $result);
+
+		$route->parse('get/users?username=alek&password=abd008dda1e0b78125d11f0ed054710f');
+		$expected = array('username' => 'alek', 'password' => 'abd008dda1e0b78125d11f0ed054710f');
+		$result = $route->query;
+		$this->assertEqual($expected, $result);
+	}
 }

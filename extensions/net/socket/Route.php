@@ -88,11 +88,12 @@ class Route extends \lithium\core\Object {
 		$arr = $this->export();
 		if (isset($arr['post'])) $arr['post'] = json_encode ($arr['post']);
 		$string = '';
-		if (isset($arr['query'])) {
+		if (isset($arr['query']) && !empty($arr['query'])) {
 			$string = '?';
 			foreach ($arr['query'] as $k => $v) {
-				$string .= "$k=$v";
+				$string .= "$k=$v&";
 			}
+			$string = substr($string,0,-1);
 			unset($arr['query']);
 		}
 		$ret = implode('/', array_values($arr));
