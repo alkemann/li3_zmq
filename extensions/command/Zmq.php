@@ -76,9 +76,9 @@ class Zmq extends \lithium\console\Command {
 			die();
 		}
 
-		$hub = $this->$this->__responder('hub');
+		$hub = $this->__connection('hub');
 
-		$responder = $this->__responder($resource);
+		$responder = $this->__connection($resource);
 
 		/** candy **/
 		$this->out('Registering with hub [',array('nl' => 0, 'style' => 'blue'));
@@ -125,7 +125,7 @@ class Zmq extends \lithium\console\Command {
 	 */
 	public function client($request_string) {
 
-		$hub = $this->__hub();
+		$hub = $this->__connection('hub');
 
 		/** candy **/
 		$this->out('Requesting HUB on [', array('nl' => 0, 'style' => 'blue'));
@@ -148,7 +148,7 @@ class Zmq extends \lithium\console\Command {
 	 * @param string $resource
 	 * @return \li3_zmq\extensions\data\source\Zeromq 
 	 */
-	private function __responder($resource) {
+	private function __connection($resource) {
 		$responder = Connections::get($resource);
 
 		/** candy **/
