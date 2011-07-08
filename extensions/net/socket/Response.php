@@ -181,10 +181,12 @@ class Response extends \lithium\core\Object {
 			}
 		} elseif ($result instanceof \lithium\data\Entity) {
 			$container['data'] = $result->to('array');
+		} elseif (is_array($result)) {
+			$container['data'] = $result;
 		}
 
 		if ($result && $container['type'] == 'Collection') {
-			$container['count'] = $container['total'] = $result->count();
+			$container['count'] = $container['total'] = count($result);
 		}
 
 		return $container;
