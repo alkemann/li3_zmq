@@ -146,7 +146,7 @@ class ZeromqTest extends \lithium\test\Unit {
 	public function testDescribe() {
 		$con = Connections::get('zmq-test');
 
-		$expected = 'describe/users';
+		$expected = array();
 		$result = $con->describe('users');
 		$this->assertEqual($expected, $result);
 	}
