@@ -37,6 +37,20 @@ use lithium\data\Connections;
  *		'model'		=> '\app\models\Users'
  *	));
  *
+ *	// Connections used for service : 
+ *	Connections::add('service', array(
+ *		'type'		=> 'Zeromq',
+ *		'protocol'	=> 'tcp',
+ *		'port'		=> '5557',
+ *		'host'		=> '*',
+ *		'socket'	=> \ZMQ::SOCKET_REP,
+ *		'model'		=> array(
+ *			'items' => '\app\models\Items',
+ *			'users'	=> '\users_plugin\models\Users',
+ *			'products'	=> '\app\models\Products',
+ *			'userproducts'	=> '\users_plugin\models\Products'
+ *		)
+));
  * }}}
  *
  * You then can start your broker (for example the provided `hub.php`) and
