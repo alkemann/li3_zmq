@@ -68,31 +68,31 @@ class Zmq extends \lithium\console\Command {
 	/**
 	 * Start a service
 	 *
-	 * @param string $resource users
+	 * @param string $resources users
 	 * @param int $port 5559
 	 * @param string $host localhost
 	 * @param string $connection tcp
 	 */
-	public function service($resource = null) {
-		if ($resource === null) {
+	public function service($resources = null) {
+		if ($resources === null) {
 			$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
 			die();
 		}
 
 		$hub = $this->__connection('hub');
 
-		$responder = $this->__connection($resource);
+		$responder = $this->__connection('service');
 
 		/** candy **/
 		$this->out('Registering with hub [',array('nl' => 0, 'style' => 'blue'));
 		$this->out($hub->connected_to(),array('nl' => 0, 'style' => 'green'));
 		$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
-		$this->out($resource, array('nl' => 0, 'style' => 'green'));
+		$this->out($resources, array('nl' => 0, 'style' => 'green'));
 		$this->out(']', array('nl' => 2, 'style' => 'blue'));
 		/** /candy **/
 
 		$port = $responder->connected_to('port');
-		$hub->send("register/$resource/$port");
+		$hub->send("register/$resources/$port");
 		$reply = $hub->recv();
 
 		if (json_decode($reply, true) !== true) {
@@ -112,7 +112,8 @@ class Zmq extends \lithium\console\Command {
 			$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
 
 			$route = Router::parse($request);
-			$response = new Response($route, $responder->model());
+			$resource = $route->resource;
+			$response = new Response($route, $responder->model($resource));
 			$result = json_encode($response->request());
 
 			//  Send reply back to client

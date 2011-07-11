@@ -97,8 +97,8 @@ class Zeromq extends \lithium\data\Source {
 	 *
 	 * @return string
 	 */
-	public function model() {
-		return $this->_config['model'];
+	public function model($resource) {
+		return $this->_config['model'][$resource];
 	}
 
 	/**
