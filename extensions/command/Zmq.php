@@ -27,16 +27,6 @@ use lithium\data\Connections;
  *		'socket'	=> \ZMQ::SOCKET_REQ
  *	));
  *
- *  // And one per Model you wish to serve
- *	Connections::add('users', array(
- *		'type'		=> 'Zeromq',
- *		'protocol'	=> 'tcp',
- *		'port'		=> '5556',
- *		'host'		=> '*',
- *		'socket'	=> \ZMQ::SOCKET_REP,
- *		'model'		=> '\app\models\Users'
- *	));
- *
  *	// Connections used for service : 
  *	Connections::add('service', array(
  *		'type'		=> 'Zeromq',
