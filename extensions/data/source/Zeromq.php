@@ -31,7 +31,7 @@ class Zeromq extends \lithium\data\Source {
 		'port' => '5555',
 		'host' => 'localhost',
 		'socket' => 3, // === \ZMQ::SOCKET_REQ
-		'model' => '\lithium\data\Model'
+		'model' => null
 	);
 	public $connection = null;
 	private $__connection = '';

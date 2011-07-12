@@ -59,7 +59,7 @@ class Route extends \lithium\core\Object {
 	// string $resource 'users','products'
 	protected $_resource = '';
 	// array
-	protected $_post = null;
+	protected $_post = array();
 	// mixed
 	protected $_send_options = null;
 
