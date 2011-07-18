@@ -198,4 +198,17 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->query;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testPostRouteEscaped() {
+		$route = new Route();
+		$post = '{"host":"http:\/\/guic.no"}';
+		$request_string = 'post/items/' . $post;
+
+		$route->parse($request_string);
+
+		$expected = json_decode($post, true);
+		$result = $route->post;
+		$this->assertEqual($expected, $result);
+	}
+
 }

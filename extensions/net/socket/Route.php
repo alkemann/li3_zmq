@@ -138,6 +138,7 @@ class Route extends \lithium\core\Object {
 	 */
 	public function parse($request) {
 		$this->input = $request;
+		$request = str_replace('\/', '%§%', $request);
 		$requestArr = explode('/', $request);
 		$request = array(
 			'request_type' => $requestArr[0], // no isset. required
@@ -161,10 +162,10 @@ class Route extends \lithium\core\Object {
 
 		switch ($request['request_type']) {
 			case 'put' :
-				$request['post'] = json_decode($request['post'], true);
+				$request['post'] = json_decode(str_replace('%§%','\/', $request['post']), true);
 				break;
 			case 'post' :
-				$request['post'] =  json_decode($request['location'], true);
+				$request['post'] =  json_decode(str_replace('%§%','\/', $request['location']), true);
 				$request['location'] = false;
 				break;
 			case 'get' :
