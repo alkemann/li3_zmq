@@ -73,6 +73,10 @@ class Response extends \lithium\core\Object {
 		$pk = $this->_route->location;
 		$post = $this->_route->post;
 
+		if ($post === null) {
+			throw new \Exception('Invalid JSON in POST of PUT of 0mq request : ' . $this->_route->input);
+		}
+
 		$model = $this->__model();
 
 		$conditions = array($model::key() => $pk);
@@ -126,18 +130,19 @@ class Response extends \lithium\core\Object {
 	public function post() {
 		$post = $this->_route->post;
 
+		if ($post === null) {
+			throw new \Exception('Invalid JSON in POST of POST of 0mq request : ' . $this->_route->input);
+		}
 		$model = $this->__model();
 
 		$container = $this->container('Entity');
 
 		$entity = $model::create($post);
 
-		if ($entity->validates()) {
-			$entity->save(null, array('validate' => false));
-			$container['data'] = $entity->to('array');
-		} else {
-			$container['errors'] = $entity->errors();
-		}
+		$entity->save();
+
+		$container['data'] = $entity->to('array');
+		$container['errors'] = $entity->errors();
 
 		return $container;
 	}

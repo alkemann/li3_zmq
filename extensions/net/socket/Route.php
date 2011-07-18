@@ -62,6 +62,8 @@ class Route extends \lithium\core\Object {
 	protected $_post = array();
 	// mixed
 	protected $_send_options = null;
+	// string
+	public $input = '';
 
 	/**
 	 * Export this object as an array
@@ -135,6 +137,7 @@ class Route extends \lithium\core\Object {
 	 * @return Route
 	 */
 	public function parse($request) {
+		$this->input = $request;
 		$requestArr = explode('/', $request);
 		$request = array(
 			'request_type' => $requestArr[0], // no isset. required

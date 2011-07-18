@@ -193,8 +193,10 @@ class Zeromq extends \lithium\data\Source {
 			if (empty($data) && empty($errors)) {
 				return false;
 			}
-			$opts = array('class' => 'entity', 'exists' => !empty($data), 'errors' => $errors);
-			return $self->item($query->model(), $data, $opts);
+			$opts = array('class' => 'entity', 'exists' => !empty($data));
+			$res = $self->item($query->model(), $data, $opts);
+			$res->errors($errors);
+			return $res;
 		});
 	}
 
