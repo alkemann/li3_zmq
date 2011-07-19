@@ -55,18 +55,22 @@ class Zeromq extends \lithium\data\Source {
 		$zmqClass = $this->__class('zmq');
 		$socketClass = $this->__class('socket');
 		$this->connection = new $socketClass($this->__context, $this->_config['socket']);
-		$this->__connection =
-				$this->_config['protocol'].
-				'://'.
-				$this->_config['host'].
-				':'.
-				$this->_config['port'];
 		try {
 			switch ($this->_config['socket']) {
 				case $zmqClass::SOCKET_REQ:
+					$this->__connection =
+							$this->_config['protocol'].
+							'://'.
+							$this->_config['host'].
+							':'.
+							$this->_config['port'];
 					$this->connection->connect($this->__connection);
 					break;
 				case $zmqClass::SOCKET_REP:
+					$this->__connection =
+							$this->_config['protocol'].
+							'://*:'.
+							$this->_config['port'];
 					$this->connection->bind($this->__connection);
 					break;
 				default:

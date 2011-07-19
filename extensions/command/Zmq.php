@@ -32,7 +32,7 @@ use lithium\data\Connections;
  *		'type'		=> 'Zeromq',
  *		'protocol'	=> 'tcp',
  *		'port'		=> '5557',
- *		'host'		=> '*',
+ *		'host'		=> 'localhost',
  *		'socket'	=> \ZMQ::SOCKET_REP,
  *		'model'		=> array(
  *			'items' => '\app\models\Items',
@@ -96,7 +96,8 @@ class Zmq extends \lithium\console\Command {
 		/** /candy **/
 
 		$port = $responder->connected_to('port');
-		$hub->send("register/$resources/$port");
+		$host = $responder->connected_to('host');
+		$hub->send("register/$resources/$host:$port");
 		$reply = $hub->recv();
 
 		if (json_decode($reply, true) !== true) {
