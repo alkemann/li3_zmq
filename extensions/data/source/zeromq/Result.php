@@ -38,7 +38,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	public function valid() {
-		return !empty($this->_resource) 
+		return !empty($this->_resource)
 				&& isset ($this->_resource['name']) && $this->_resource['name'] == 'Container'
 				&& isset ($this->_resource['data']) && !empty($this->_resource['data']);
 	}

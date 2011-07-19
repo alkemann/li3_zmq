@@ -13,7 +13,7 @@ namespace li3_zmq\tests\mocks\zmq;
  * Mocks ZMQ to allow for testing without ZMQ binding installed
  */
 class MockZMQ {
-	
+
 	const SOCKET_PAIR = 0 ;
 	const SOCKET_PUB = 1 ;
 	const SOCKET_SUB = 2 ;

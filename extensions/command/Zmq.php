@@ -16,7 +16,7 @@ use lithium\data\Connections;
 /**
  * Start or test ZeroMQ sockets and services
  *
- * Create at least two connections in `app/config/boostrap/connections.php` : 
+ * Create at least two connections in `app/config/boostrap/connections.php` :
  * {{{
  *  //One called `hub` for the message broker
  *	Connections::add('hub', array(
@@ -27,7 +27,7 @@ use lithium\data\Connections;
  *		'socket'	=> \ZMQ::SOCKET_REQ
  *	));
  *
- *	// Connections used for service : 
+ *	// Connections used for service :
  *	Connections::add('service', array(
  *		'type'		=> 'Zeromq',
  *		'protocol'	=> 'tcp',
@@ -154,7 +154,7 @@ class Zmq extends \lithium\console\Command {
 	 * Get the connection called $resource
 	 *
 	 * @param string $resource
-	 * @return \li3_zmq\extensions\data\source\Zeromq 
+	 * @return \li3_zmq\extensions\data\source\Zeromq
 	 */
 	private function __connection($resource) {
 		$responder = Connections::get($resource);
