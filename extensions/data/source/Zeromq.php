@@ -47,6 +47,14 @@ class Zeromq extends \lithium\data\Source {
 	protected function __class($name) { return '\\'.$this->_classes[$name]; }
 
 	/**
+	 * Change the port of the connection
+	 * Use this to have multiple services on the same connection config
+	 *
+	 * @param type $port 
+	 */
+	public function change_port($port) { $this->_config['port'] = $port; }
+
+	/**
 	 * Create a Socket connection to host specified in protocol. Auto called on construction
 	 *
 	 * @return Zeromq

@@ -77,7 +77,7 @@ class Zmq extends \lithium\console\Command {
 	 * @param string $host localhost
 	 * @param string $connection tcp
 	 */
-	public function service($resources = null) {
+	public function service($resources = null, $port = null) {
 		if ($resources === null) {
 			$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
 			die();
@@ -85,7 +85,7 @@ class Zmq extends \lithium\console\Command {
 
 		$hub = $this->__connection('hub');
 
-		$responder = $this->__connection('service');
+		$responder = $this->__connection('service' , $port);
 
 		/** candy **/
 		$this->out('Registering with hub [',array('nl' => 0, 'style' => 'blue'));
@@ -154,11 +154,12 @@ class Zmq extends \lithium\console\Command {
 	/**
 	 * Get the connection called $resource
 	 *
-	 * @param string $resource
+	 * @param string $connection_config
+	 * @param string $port
 	 * @return \li3_zmq\extensions\data\source\Zeromq
 	 */
-	private function __connection($resource) {
-		$responder = Connections::get($resource);
+	private function __connection($connection_config, $port = null) {
+		$responder = Connections::get($connection_config);
 
 		/** candy **/
 		if ($responder === null) {
@@ -170,6 +171,13 @@ class Zmq extends \lithium\console\Command {
 			die();
 		}
 		/** /candy **/
+
+		if ($port !== null) {
+			$responder->change_port($port);
+		}
+
+		$responder->connect();
+
 		return $responder;
 	}
 
