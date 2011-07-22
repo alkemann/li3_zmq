@@ -77,44 +77,67 @@ class Zmq extends \lithium\console\Command {
 	 * @param string $host localhost
 	 * @param string $connection tcp
 	 */
-	public function service($resources = null, $port = null) {
+	public function service($resources = null) {
+		$verbose = !(isset($this->silent) || isset($this->s));
+		$port = isset($this->port) ? $this->port : '5559';
 		if ($resources === null) {
-			$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
-			die();
+			if ($verbose) {
+				$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
+				exit;
+			} else {
+				throw new \Exception('No service provided');
+			}
 		}
 
 		$hub = $this->__connection('hub');
 
 		$responder = $this->__connection('service' , $port);
 
-		/** candy **/
-		$this->out('Registering with hub [',array('nl' => 0, 'style' => 'blue'));
-		$this->out($hub->connected_to(),array('nl' => 0, 'style' => 'green'));
-		$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
-		$this->out($resources, array('nl' => 0, 'style' => 'green'));
-		$this->out(']', array('nl' => 2, 'style' => 'blue'));
-		/** /candy **/
-
 		$port = $responder->connected_to('port');
 		$host = $responder->connected_to('host');
+
+		/** candy **/
+		if ($verbose) {
+			$this->out('Registering as ['.$host.':'.$port.'] with hub [',array('nl' => 0, 'style' => 'blue'));
+			$this->out($hub->connected_to(),array('nl' => 0, 'style' => 'green'));
+			$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
+			$this->out($resources, array('nl' => 0, 'style' => 'green'));
+			$this->out(']', array('nl' => 2, 'style' => 'blue'));
+		}
+		/** /candy **/
+
 		$hub->send("register/$resources/$host:$port");
 		$reply = $hub->recv();
 
 		if (json_decode($reply, true) !== true) {
-			$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
-			$this->out('Register with Hub failed!',array('nl' => 2, 'style' => 'blue'));
-			die();
+			if ($verbose) {
+				$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
+				$this->out('Register with Hub failed!',array('nl' => 2, 'style' => 'blue'));
+				exit;
+			} else {
+				throw new \Exception('Register with hub failed');
+			}
+
 		}
 
 		while(true) {
-			$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
-			$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
-			$this->out(']', array('nl' => 1, 'style' => 'blue'));
+			/** candy **/
+			if ($verbose) {
+				$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
+				$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
+				$this->out(']', array('nl' => 1, 'style' => 'blue'));
+			}
+			/** /candy **/
 
 			$request = $responder->recv(); // Blocking
-			$this->out('Received request: [', array('nl' => 0 ,'style' => 'blue'));
-			$this->out($request,  array('nl' => 0 ,'style' => 'green'));
-			$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
+					/** candy **/
+
+			if ($verbose) {
+				$this->out('Received request: [', array('nl' => 0 ,'style' => 'blue'));
+				$this->out($request,  array('nl' => 0 ,'style' => 'green'));
+				$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
+			}
+			/** /candy **/
 
 			$route = Router::parse($request);
 			$resource = $route->resource;
@@ -133,15 +156,19 @@ class Zmq extends \lithium\console\Command {
 	 * @param string $query Primary key
 	 */
 	public function client($request_string) {
+		$verbose = !(isset($this->silent) || isset($this->s));
 
 		$hub = $this->__connection('hub');
 
 		/** candy **/
-		$this->out('Requesting HUB on [', array('nl' => 0, 'style' => 'blue'));
-		$this->out($hub->connected_to(), array('nl' => 0, 'style' => 'green'));
-		$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
-		$this->out($request_string, array('nl' => 0, 'style' => 'green'));
-		$this->out(']', array('nl' => 1, 'style' => 'blue'));
+		if ($verbose) {
+			$this->out('Requesting HUB on [', array('nl' => 0, 'style' => 'blue'));
+			$this->out($hub->connected_to(), array('nl' => 0, 'style' => 'green'));
+			$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
+			$this->out($request_string, array('nl' => 0, 'style' => 'green'));
+			$this->out(']', array('nl' => 1, 'style' => 'blue'));
+		}
+		/** /candy **/
 
 		$hub->send($request_string);
 		$reply = $hub->recv();
@@ -163,12 +190,16 @@ class Zmq extends \lithium\console\Command {
 
 		/** candy **/
 		if ($responder === null) {
-			$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
-			$this->out('Create a connection called "',array('nl' => 0, 'style' => 'blue'));
-			$this->out($resource,array('nl' => 0, 'style' => 'green'));
-			$this->out('" in ',array('nl' => 0, 'style' => 'blue'));
-			$this->out('/app/config/bootstrap/connections.php',array('nl' => 2, 'style' => 'green'));
-			die();
+			if ($verbose) {
+				$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
+				$this->out('Create a connection called "',array('nl' => 0, 'style' => 'blue'));
+				$this->out($resource,array('nl' => 0, 'style' => 'green'));
+				$this->out('" in ',array('nl' => 0, 'style' => 'blue'));
+				$this->out('/app/config/bootstrap/connections.php',array('nl' => 2, 'style' => 'green'));
+				exit;
+			} else {
+				throw new \Exception('Missing connection');
+			}
 		}
 		/** /candy **/
 
