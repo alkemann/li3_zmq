@@ -77,9 +77,9 @@ class Zmq extends \lithium\console\Command {
 	 * @param string $host localhost
 	 * @param string $connection tcp
 	 */
-	public function service($resources = null) {
+	public function service($resources = null, $port = null) {
 		$verbose = !(isset($this->silent) || isset($this->s));
-		$port = isset($this->port) ? $this->port : '5559';
+		$port = $port ?: (isset($this->port) ? $this->port : '5559');
 		if ($resources === null) {
 			if ($verbose) {
 				$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
