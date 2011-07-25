@@ -110,6 +110,9 @@ class Zeromq extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function model($resource) {
+		if (!isset($this->_config['model'][$resource])) {
+			throw new \Exception('Missing connection for resource : ' . $resource);
+		}
 		return $this->_config['model'][$resource];
 	}
 
