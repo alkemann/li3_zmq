@@ -59,11 +59,16 @@ class Posts extends \lithium\tests\mocks\data\MockBase {
 	}
 
 	public function save($entity, $data = array(), array $options = array()) {
-		$pk = static::meta('key');
-		if (!isset($entity->$pk)) {
-			$entity->$pk = Posts::pk();
+		$data = $data ?: array();
+		$entity->set($data);
+		$valid = $entity->validates();
+		if ($valid) {
+			$pk = static::meta('key');
+			if (!isset($entity->$pk)) {
+				$entity->$pk = Posts::pk();
+			}
 		}
-		return true;
+		return $valid;
 	}
 
 }

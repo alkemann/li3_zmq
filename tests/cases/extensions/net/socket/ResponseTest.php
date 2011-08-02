@@ -45,9 +45,10 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testPostValidateFail() {
-		$response = new Response(Router::parse('post/posts/{"title":"titt#elen"}'), '\li3_zmq\tests\mocks\models\Posts');
+		$response = new Response(Router::parse('post/posts/{"title":"tit#telen"}'), '\li3_zmq\tests\mocks\models\Posts');
 		$result = $response->request();
-		$this->assertFalse($result['data']);
+		$expected = array('title' => 'tit#telen');
+		$this->assertEqual($expected, $result['data']);
 		$expected = array('title' => array('Only Alphanumeric'));
 		$this->assertEqual($expected, $result['errors']);
 	}

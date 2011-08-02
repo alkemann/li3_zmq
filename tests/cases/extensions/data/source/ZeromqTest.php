@@ -29,12 +29,16 @@ class ZeromqTest extends \lithium\test\Unit {
 	public function skip() {
 		Connections::add('zmq-test', array(
 			'type' => 'Zeromq',
-			'model' => '\li3_zmq\tests\mocks\models\Posts',
+			'model'	=> array(
+				'posts' => '\li3_zmq\tests\mocks\models\Posts'
+			),
 			'classes' => $this->__classes
 		));
 		Connections::add('zmq-test-entity', array(
 			'type' => 'Zeromq',
-			'model' => '\li3_zmq\tests\mocks\models\Posts',
+			'model'	=> array(
+				'posts' => '\li3_zmq\tests\mocks\models\Posts'
+			),
 			'classes' => array(
 				'result' => 'li3_zmq\tests\mocks\zmq\MockEntityResult',
 			) + $this->__classes
@@ -73,7 +77,7 @@ class ZeromqTest extends \lithium\test\Unit {
 			'classes' => $this->__classes
 		));
 		$con2 = Connections::get('zmq-test-config');
-		$expected = 'igm://example.org:5959';
+		$expected = 'igm://*:5959';
 		$result = $con2->connection->connected_to;
 		$this->assertEqual($expected, $result);
 	}
@@ -82,7 +86,7 @@ class ZeromqTest extends \lithium\test\Unit {
 		$con = Connections::get('zmq-test');
 
 		$expected = '\li3_zmq\tests\mocks\models\Posts';
-		$result = $con->model();
+		$result = $con->model('posts');
 		$this->assertEqual($expected, $result);
 	}
 
