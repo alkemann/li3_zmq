@@ -25,7 +25,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	public function __construct(array $config = array()) {
 		$defaults = array('resource' => null);
 		parent::__construct($config + $defaults);
-		$this->_resource = json_decode($this->_config['resource'], true);
+		$this->_resource = $this->_config['resource'];
 		unset($this->_config['resource']);
 	}
 

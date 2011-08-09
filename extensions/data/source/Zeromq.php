@@ -130,6 +130,7 @@ class Zeromq extends \lithium\data\Source {
 	 * @param mixed $msgs
 	 */
 	public function send($msgs) {
+		$this->connect();
 		$this->connection->send($msgs);
 		return $this;
 	}
@@ -140,7 +141,26 @@ class Zeromq extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function recv() {
-		return $this->connection->recv();
+		$result = array();
+		do {
+			$reply = $this->connection->recvMulti();
+			$msg = array_pop($reply);
+			list($type, $content) = explode('/', $msg, 2);
+			switch ($type) {
+				case 'part' :
+				case 'last' :
+					if (empty($result)) {
+						$result = json_decode($content, true);
+					} else {
+						$result = Response::merge($result, json_decode($content, true));
+					}
+					break;
+				default :
+				case 'error':
+					throw new \Exception('ZMQ datasource ERROR: ' . $msg. PHP_EOL);
+			}
+		} while ($type !== 'last');
+		return $result;
 	}
 
 	/**
