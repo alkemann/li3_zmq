@@ -209,11 +209,43 @@ class Zmq extends \lithium\console\Command {
 		/** /candy **/
 
 		$hub->send($request_string);
-		$reply = $hub->recv();
 
-		echo "\n";
-		print_r(json_decode($reply, true));
-		echo "\n";
+		$result = array();
+		do {
+			$reply = $hub->socket()->recvMulti();
+			$msg = array_pop($reply);
+			list($type, $content) = explode('/', $msg, 2);
+			switch ($type) {
+				case 'error': die('ERROR: ' . $content. PHP_EOL); break;
+				case 'part' :
+					echo PHP_EOL, 'Received part.', PHP_EOL;
+				case 'last' :
+					if (empty($result)) {
+						$result = json_decode($content, true);
+					} else {
+						$result = Response::merge($result, json_decode($content, true));
+					}
+					break;
+				default :
+					echo PHP_EOL, $type, PHP_EOL, $content;
+					die('EXIT');
+			}
+		} while ($type !== 'last');
+
+		if ($verbose) echo PHP_EOL;
+		if (isset($this->json)) {
+			echo json_encode($result), PHP_EOL;
+		} else {
+			print_r($result);
+		}
+		if ($verbose) echo PHP_EOL;
+
+		if ($verbose) {
+			echo PHP_EOL;
+			$this->out('Client done.', array('nl' => 0, 'style' => 'blue'));
+			echo PHP_EOL;
+		}
+
 	}
 
 	/**
