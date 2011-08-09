@@ -24,16 +24,22 @@ use lithium\data\Connections;
  *		'protocol'	=> 'tcp',
  *		'port'		=> '5555',
  *		'host'		=> 'localhost',
- *		'socket'	=> \ZMQ::SOCKET_REQ
+ *		'socket'	=> \ZMQ::SOCKET_QREQ,
+ *		'options'	  => array(
+ *			\ZMQ::SOCKOPT_LINGER => 0
+ *		),
  *	));
  *
  *	// Connections used for service :
  *	Connections::add('service', array(
  *		'type'		=> 'Zeromq',
  *		'protocol'	=> 'tcp',
- *		'port'		=> '5557',
+ *		'port'		=> '5555',
  *		'host'		=> 'localhost',
- *		'socket'	=> \ZMQ::SOCKET_REP,
+ *		'socket'	=> \ZMQ::SOCKET_XREQ,
+ *		'options'	  => array(
+ *			\ZMQ::SOCKOPT_LINGER => 0
+ *		),
  *		'model'		=> array(
  *			'items' => '\app\models\Items',
  *			'users'	=> '\users_plugin\models\Users',

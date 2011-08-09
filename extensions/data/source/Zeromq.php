@@ -63,9 +63,13 @@ class Zeromq extends \lithium\data\Source {
 		$zmqClass = $this->__class('zmq');
 		$socketClass = $this->__class('socket');
 		$this->connection = new $socketClass($this->__context, $this->_config['socket']);
+		foreach ($this->_config['options'] as $option => $value) {
+			$this->connection->setSockOpt($option, $value);
+		}
 		try {
 			switch ($this->_config['socket']) {
 				case $zmqClass::SOCKET_REQ:
+				case $zmqClass::SOCKET_XREQ:
 					$this->__connection =
 							$this->_config['protocol'].
 							'://'.
@@ -82,7 +86,7 @@ class Zeromq extends \lithium\data\Source {
 					$this->connection->bind($this->__connection);
 					break;
 				default:
-					die('no socket connection set');
+					die('Invalid Socket type set.');
 			}
 		} catch(\ZMQSocketException $e) {
 			throw new \ZMQSocketException($this->__connection . ' already in use', 98);
