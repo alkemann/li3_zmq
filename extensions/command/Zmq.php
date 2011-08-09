@@ -11,6 +11,7 @@ namespace li3_zmq\extensions\command;
 
 use li3_zmq\extensions\net\socket\Router;
 use li3_zmq\extensions\net\socket\Response;
+use li3_zmq\extensions\data\source\zeromq\Envelope;
 use lithium\data\Connections;
 
 /**
@@ -72,20 +73,16 @@ class Zmq extends \lithium\console\Command {
 			$this->error('ERROR: ZeroMQ binding for PHP not installed.', array('nl' => 2, 'style' => 'error'));
 			die();
 		}
-		$this->__context = new \ZMQContext();
+		$this->__context = new \ZMQContext(1);
 	}
 
 	/**
 	 * Start a service
 	 *
 	 * @param string $resources users
-	 * @param int $port 5559
-	 * @param string $host localhost
-	 * @param string $connection tcp
 	 */
-	public function service($resources = null, $port = null) {
+	public function service($resources = null) {
 		$verbose = !(isset($this->silent) || isset($this->s));
-		$port = $port ?: (isset($this->port) ? $this->port : '5559');
 		if ($resources === null) {
 			if ($verbose) {
 				$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
@@ -95,63 +92,98 @@ class Zmq extends \lithium\console\Command {
 			}
 		}
 
-		$hub = $this->__connection('hub');
-
-		$responder = $this->__connection('service' , $port);
-
-		$port = $responder->connected_to('port');
-		$host = $responder->connected_to('host');
+		$responder = $this->__connection('service');
 
 		/** candy **/
 		if ($verbose) {
-			$this->out('Registering as ['.$host.':'.$port.'] with hub [',array('nl' => 0, 'style' => 'blue'));
-			$this->out($hub->connected_to(),array('nl' => 0, 'style' => 'green'));
+			$this->out('Registering as with hub [',array('nl' => 0, 'style' => 'blue'));
+			$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
 			$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
 			$this->out($resources, array('nl' => 0, 'style' => 'green'));
 			$this->out(']', array('nl' => 2, 'style' => 'blue'));
 		}
 		/** /candy **/
 
-		$hub->send("register/$resources/$host:$port");
-		$reply = $hub->recv();
+		$responder->send("register/$resources");
 
-		if (json_decode($reply, true) !== true) {
-			if ($verbose) {
-				$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
-				$this->out('Register with Hub failed!',array('nl' => 2, 'style' => 'blue'));
-				exit;
-			} else {
-				throw new \Exception('Register with hub failed');
-			}
+		$lastHeardFromHub = microtime(true);
+		$read = $write = array();
+		$attempts = 0;
 
+		/** candy **/
+		if ($verbose) {
+			$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
+			$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
+			$this->out(']', array('nl' => 1, 'style' => 'blue'));
 		}
-
+		/** /candy **/
 		while(true) {
-			/** candy **/
-			if ($verbose) {
-				$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
-				$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
-				$this->out(']', array('nl' => 1, 'style' => 'blue'));
+
+			$poll = new \ZMQPoll();
+			$poll->add($responder->socket(), \ZMQ::POLL_IN); // use connections config for pull duration
+			$events = $poll->poll($read, $write, 3 /** sec ***/ * 1000000);
+
+			$now = microtime(true);
+
+			if ($events) {
+				$envelope = new Envelope();
+				$envelope->recv($responder->socket());
+				$request = $envelope->content;
+
+				$lastHeardFromHub = $now;
+
+				if ($request === 'registered') {
+					if ($verbose) {
+						echo PHP_EOL;
+						$this->out('Registration successful', array('nl' => 0 ,'style' => 'blue'));
+						echo PHP_EOL;
+					}
+					$attempts = 0;
+					continue;
+				} elseif ($request === 'ping') {
+					$envelope->content = 'ping/'.time();
+					// Ping back
+					$envelope->send($responder->socket());
+					if ($verbose) echo '!';
+					continue;
+				}
+
+				/** candy **/
+				if ($verbose) {
+					echo PHP_EOL;
+					$this->out('Received request: [', array('nl' => 0 ,'style' => 'blue'));
+					$this->out($request,  array('nl' => 0 ,'style' => 'green'));
+					$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
+					echo PHP_EOL;
+				}
+				/** /candy **/
+
+				$route = Router::parse($request);
+				$resource = $route->resource;
+				$response = new Response($route, $responder->model($resource));
+				$envelope->content = 'reply/'.json_encode($response->request());
+
+				//  Send reply back to client
+				$envelope->send($responder->socket());
+			} else {
+				if ($verbose) echo '.';
 			}
-			/** /candy **/
-
-			$request = $responder->recv(); // Blocking
-					/** candy **/
-
-			if ($verbose) {
-				$this->out('Received request: [', array('nl' => 0 ,'style' => 'blue'));
-				$this->out($request,  array('nl' => 0 ,'style' => 'green'));
-				$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
+			$expiry = $lastHeardFromHub + 9 /** sec **/;
+			if ($now > $expiry) {
+				if ($attempts++ >= 3) {
+					if ($verbose) {
+						echo PHP_EOL;
+						$this->out('Third attempt to reregister failed! Hub is dead! EXITING!', array('nl' => 0 ,'style' => 'red'));
+					}
+					exit;
+				}
+				$lastHeardFromHub = $now;
+				if ($verbose) {
+					echo PHP_EOL;
+					$this->out('Reregistering with hub', array('nl' => 0 ,'style' => 'green'));
+				}
+				$responder->send("register/$resources");
 			}
-			/** /candy **/
-
-			$route = Router::parse($request);
-			$resource = $route->resource;
-			$response = new Response($route, $responder->model($resource));
-			$result = json_encode($response->request());
-
-			//  Send reply back to client
-			$responder->send($result);
 		}
 	}
 

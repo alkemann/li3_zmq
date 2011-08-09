@@ -120,6 +120,10 @@ class Zeromq extends \lithium\data\Source {
 		return $this->_config['model'][$resource];
 	}
 
+	public function socket() {
+		return $this->connection;
+	}
+
 	/**
 	 * Send $msgs over socket connection
 	 *
