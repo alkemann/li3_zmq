@@ -78,13 +78,21 @@ class Zmq extends \lithium\console\Command {
 
 	/**
 	 * Start a service
+	 *  Usage: li3 zmq service resource[,resource] [--log|beat|data]
+	 *	--log	Provide text output
+	 *	--beat	Include beats in output
+	 *	--data	Include data in output
+	 *
 	 *
 	 * @param string $resources users
 	 */
 	public function service($resources = null) {
-		$verbose = !(isset($this->silent) || isset($this->s));
+		$log = isset($this->log);
+		$beat = isset($this->beat);
+		$data = isset($this->data);
+
 		if ($resources === null) {
-			if ($verbose) {
+			if ($log) {
 				$this->error('ERROR: What service would you like to provide today?', array('nl' => 2, 'style' => 'error'));
 				exit;
 			} else {
@@ -95,7 +103,7 @@ class Zmq extends \lithium\console\Command {
 		$responder = $this->__connection('service');
 
 		/** candy **/
-		if ($verbose) {
+		if ($log) {
 			$this->out('Registering as with hub [',array('nl' => 0, 'style' => 'blue'));
 			$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
 			$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
@@ -111,7 +119,7 @@ class Zmq extends \lithium\console\Command {
 		$attempts = 0;
 
 		/** candy **/
-		if ($verbose) {
+		if ($log) {
 			$this->out('Waiting on [',array('nl' => 0, 'style' => 'blue'));
 			$this->out($responder->connected_to(),array('nl' => 0, 'style' => 'green'));
 			$this->out(']', array('nl' => 1, 'style' => 'blue'));
@@ -133,7 +141,7 @@ class Zmq extends \lithium\console\Command {
 				$lastHeardFromHub = $now;
 
 				if ($request === 'registered') {
-					if ($verbose) {
+					if ($log) {
 						echo PHP_EOL;
 						$this->out('Registration successful', array('nl' => 0 ,'style' => 'blue'));
 						echo PHP_EOL;
@@ -144,17 +152,16 @@ class Zmq extends \lithium\console\Command {
 					$envelope->content = 'ping/'.time();
 					// Ping back
 					$envelope->send($responder->socket());
-					if ($verbose) echo '!';
+					if ($beat) echo '!';
 					continue;
 				}
 
 				/** candy **/
-				if ($verbose) {
-					echo PHP_EOL;
+				if ($log) {
+					if ($beat) echo PHP_EOL;
 					$this->out('Received request: [', array('nl' => 0 ,'style' => 'blue'));
 					$this->out($request,  array('nl' => 0 ,'style' => 'green'));
 					$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
-					echo PHP_EOL;
 				}
 				/** /candy **/
 
@@ -163,22 +170,30 @@ class Zmq extends \lithium\console\Command {
 				$response = new Response($route, $responder->model($resource));
 				$envelope->content = 'reply/'.json_encode($response->request());
 
+				if ($data) {
+					echo PHP_EOL;
+					$this->out('Sending reply: [', array('nl' => 0 ,'style' => 'blue'));
+					$this->out($envelope->content,  array('nl' => 0 ,'style' => 'green'));
+					$this->out(']',  array('nl' => 1 ,'style' => 'blue'));
+					echo PHP_EOL;
+				}
+
 				//  Send reply back to client
 				$envelope->send($responder->socket());
 			} else {
-				if ($verbose) echo '.';
+				if ($beat) echo '.';
 			}
 			$expiry = $lastHeardFromHub + 9 /** sec **/;
 			if ($now > $expiry) {
 				if ($attempts++ >= 3) {
-					if ($verbose) {
+					if ($log) {
 						echo PHP_EOL;
 						$this->out('Third attempt to reregister failed! Hub is dead! EXITING!', array('nl' => 0 ,'style' => 'red'));
 					}
 					exit;
 				}
 				$lastHeardFromHub = $now;
-				if ($verbose) {
+				if ($log) {
 					echo PHP_EOL;
 					$this->out('Reregistering with hub', array('nl' => 0 ,'style' => 'green'));
 				}
@@ -189,17 +204,19 @@ class Zmq extends \lithium\console\Command {
 
 	/**
 	 * Make a client request
+	 *  Usage: li3 zmq client [request string] [--log]
+	 *	--log	Provide text output
 	 *
 	 * @param string $resource Resource to query
 	 * @param string $query Primary key
 	 */
 	public function client($request_string) {
-		$verbose = !(isset($this->silent) || isset($this->s));
+		$log = isset($this->log);
 
 		$hub = $this->__connection('hub');
 
 		/** candy **/
-		if ($verbose) {
+		if ($log) {
 			$this->out('Requesting HUB on [', array('nl' => 0, 'style' => 'blue'));
 			$this->out($hub->connected_to(), array('nl' => 0, 'style' => 'green'));
 			$this->out('] for [', array('nl' => 0, 'style' => 'blue'));
@@ -232,15 +249,15 @@ class Zmq extends \lithium\console\Command {
 			}
 		} while ($type !== 'last');
 
-		if ($verbose) echo PHP_EOL;
+		if ($log) echo PHP_EOL;
 		if (isset($this->json)) {
 			echo json_encode($result), PHP_EOL;
 		} else {
 			print_r($result);
 		}
-		if ($verbose) echo PHP_EOL;
+		if ($log) echo PHP_EOL;
 
-		if ($verbose) {
+		if ($log) {
 			echo PHP_EOL;
 			$this->out('Client done.', array('nl' => 0, 'style' => 'blue'));
 			echo PHP_EOL;
@@ -260,7 +277,7 @@ class Zmq extends \lithium\console\Command {
 
 		/** candy **/
 		if ($responder === null) {
-			if ($verbose) {
+			if ($log) {
 				$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
 				$this->out('Create a connection called "',array('nl' => 0, 'style' => 'blue'));
 				$this->out($resource,array('nl' => 0, 'style' => 'green'));
