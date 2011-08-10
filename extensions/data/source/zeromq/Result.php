@@ -26,6 +26,9 @@ class Result extends \lithium\core\Object implements \Iterator {
 		$defaults = array('resource' => null);
 		parent::__construct($config + $defaults);
 		$this->_resource = $this->_config['resource'];
+		if (!$this->valid()) {
+			throw new \Exception('Empty resource. Possibly no such provider');
+		}
 		unset($this->_config['resource']);
 	}
 
@@ -40,7 +43,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	public function valid() {
 		return !empty($this->_resource)
 				&& isset ($this->_resource['name']) && $this->_resource['name'] == 'Container'
-				&& isset ($this->_resource['data']) && !empty($this->_resource['data']);
+				&& isset ($this->_resource['data']);
 	}
 
 	public function current() {
