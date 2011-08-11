@@ -102,6 +102,8 @@ class Zmq extends \lithium\console\Command {
 		}
 
 		$responder = $this->__connection('service');
+		$responder->identity(isset($this->identity) ? $this->identity : gethostname().'.'.$resources);
+		$responder->connect();
 
 		/** candy **/
 		if ($log) {
@@ -216,7 +218,7 @@ class Zmq extends \lithium\console\Command {
 	public function client($request_string) {
 		$log = isset($this->log);
 
-		$hub = $this->__connection('hub');
+		$hub = $this->__connection('hub')->connect();
 
 		/** candy **/
 		if ($log) {
@@ -294,7 +296,8 @@ class Zmq extends \lithium\console\Command {
 
 		$context = new \ZMQContext();
 
-		$subscriber = $this->__connection('subscriber')->socket();
+		$subscriber = $this->__connection('subscriber')->connect()->socket();
+
 		foreach ($subs as $sub) $subscriber->setSockOpt(\ZMQ::SOCKOPT_SUBSCRIBE, $sub);
 
 		$this->out('Starting SUBSCRIPTION logger for : ', array('nl'=>0, 'style' => 'blue'));
@@ -337,9 +340,6 @@ class Zmq extends \lithium\console\Command {
 			}
 		}
 		/** /candy **/
-
-		$responder->connect();
-
 		return $responder;
 	}
 
