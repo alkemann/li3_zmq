@@ -83,6 +83,7 @@ class Zmq extends \lithium\console\Command {
 	 *	--beat	Include beats in output
 	 *	--data	Include data in output
 	 *
+	 * Requires a connection called 'service' in `config\bootstrap\connections.php`
 	 *
 	 * @param string $resources users
 	 */
@@ -207,6 +208,8 @@ class Zmq extends \lithium\console\Command {
 	 *  Usage: li3 zmq client [request string] [--log]
 	 *	--log	Provide text output
 	 *
+	 * Requires a connection called 'hub' in `config\bootstrap\connections.php`
+	 *
 	 * @param string $resource Resource to query
 	 * @param string $query Primary key
 	 */
@@ -263,6 +266,53 @@ class Zmq extends \lithium\console\Command {
 			echo PHP_EOL;
 		}
 
+	}
+
+	/**
+	 * Start a logger that will echo events published by the hub
+	 *  Usage: li3 zmq listen sub1[,sub2,..]
+	 *
+	 * Possible subscriptions are :
+	 *	request, get, post, delete, put,
+	 *  status, ping, register, event
+	 *
+	 * Requires a connection called 'subscriber' in `config\bootstrap\connections.php`
+	 *
+	 * @param string $resources users
+	 */
+	public function listen($stuff) {
+		$subs = explode(',', $stuff);
+		$map = array(
+			'post' => '!REQUEST! post',
+			'get' => '!REQUEST! get',
+			'put' => '!REQUEST! put',
+			'delete' => '!REQUEST! delete',
+		);
+		$subs = array_map(function($v) use ($map) {
+			if (isset($map[$v])) return $map[$v];
+			else return '!'.strtoupper($v).'!';
+		}, $subs);
+
+		$context = new \ZMQContext();
+
+		$subscriber = $this->__connection('subscriber')->socket();
+		foreach ($subs as $sub) $subscriber->setSockOpt(\ZMQ::SOCKOPT_SUBSCRIBE, $sub);
+
+		$this->out('Starting SUBSCRIPTION logger for : ', array('nl'=>0, 'style' => 'blue'));
+
+		foreach ($subs as $sub) {
+			$this->out('[', array('nl'=>0, 'style' => 'blue'));
+			$this->out($sub, array('nl'=>0, 'style' => 'green'));
+			$this->out(']', array('nl'=>0, 'style' => 'blue'));
+		}
+		$this->out(' ', array('nl'=>2, 'style' => 'blue'));
+
+		while (true) {
+			$msg = $subscriber->recv();
+			$this->out(date("H:i:s"),array('nl' => 0, 'style' => 'red'));
+			$this->out(' > ',array('nl' => 0, 'style' => 'blue'));
+			$this->out($msg,array('nl' => 1, 'style' => 'green'));
+		}
 	}
 
 	/**
