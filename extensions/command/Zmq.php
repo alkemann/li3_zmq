@@ -269,10 +269,9 @@ class Zmq extends \lithium\console\Command {
 	 * Get the connection called $resource
 	 *
 	 * @param string $connection_config
-	 * @param string $port
 	 * @return \li3_zmq\extensions\data\source\Zeromq
 	 */
-	private function __connection($connection_config, $port = null) {
+	private function __connection($connection_config) {
 		$responder = Connections::get($connection_config);
 
 		/** candy **/
@@ -289,10 +288,6 @@ class Zmq extends \lithium\console\Command {
 			}
 		}
 		/** /candy **/
-
-		if ($port !== null) {
-			$responder->change_port($port);
-		}
 
 		$responder->connect();
 
