@@ -271,16 +271,15 @@ class Zmq extends \lithium\console\Command {
 	/**
 	 * Start a logger that will echo events published by the hub
 	 *  Usage: li3 zmq listen sub1[,sub2,..]
-	 *
-	 * Possible subscriptions are :
+	 *   Possible subscriptions are :
 	 *	request, get, post, delete, put,
-	 *  status, ping, register, event
+	 *	status, ping, register, event
 	 *
 	 * Requires a connection called 'subscriber' in `config\bootstrap\connections.php`
 	 *
 	 * @param string $resources users
 	 */
-	public function listen($stuff) {
+	public function listen($stuff = 'event,error') {
 		$subs = explode(',', $stuff);
 		$map = array(
 			'post' => '!REQUEST! post',
