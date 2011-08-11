@@ -259,7 +259,7 @@ class Zmq extends \lithium\console\Command {
 
 		if ($log) {
 			echo PHP_EOL;
-			$this->out('Client done.', array('nl' => 0, 'style' => 'blue'));
+			$this->out('Client done.', array('nl' => 2, 'style' => 'blue'));
 			echo PHP_EOL;
 		}
 
@@ -276,7 +276,7 @@ class Zmq extends \lithium\console\Command {
 
 		/** candy **/
 		if ($responder === null) {
-			if ($log) {
+			if (isset($this->log)) {
 				$this->out('ERROR: ',array('nl' => 0, 'style' => 'red'));
 				$this->out('Create a connection called "',array('nl' => 0, 'style' => 'blue'));
 				$this->out($resource,array('nl' => 0, 'style' => 'green'));
