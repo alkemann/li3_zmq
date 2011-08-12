@@ -247,8 +247,8 @@ class Response extends \lithium\core\Object {
 		$ret['total'] += $two['total'];
 		if (is_array($one['data'])) {
 			if (is_array($two['data'])) {
-				$ret['data'] += Set::merge($one['data'],$two['data']);
-			} // else $ret['data'] = $one['data'];
+				$ret['data'] += $two['data'];
+			}
 		} else {
 			// either two is the only array, or two is also false
 			$ret['data'] = $two['data'];
