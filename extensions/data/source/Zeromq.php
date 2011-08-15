@@ -157,6 +157,8 @@ class Zeromq extends \lithium\data\Source {
 						$result = Response::merge($result, json_decode($content, true));
 					}
 					break;
+				case 'message' :
+					return $content;
 				default :
 				case 'error':
 					throw new \Exception('ZMQ datasource ERROR: ' . $msg. PHP_EOL);

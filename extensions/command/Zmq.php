@@ -206,6 +206,48 @@ class Zmq extends \lithium\console\Command {
 	}
 
 	/**
+	 * Send status messages to HUB, check if it is alive
+	 *  Usage: li3 zmq supervise [delay=60.0] [--log|beat|data]
+	 *	--log	Provide text output
+	 *	--beat	Include beats in output
+	 *
+	 * @param float $delay
+	 */
+	public function supervise($delay = 60.0) {
+		$log = isset($this->log);
+		$beat = isset($this->beat);
+
+		$hub = $this->__connection('hub')->connect();
+
+		$timeout = $delay /** seconds **/ * 1000000;
+		$attempts = 0;
+
+		$read = $write = array();
+		$hub->send('status');
+		while (true) {
+			$poll = new \ZMQPoll();
+			$poll->add($hub->socket(), \ZMQ::POLL_IN); // use connections config for pull duration
+			$events = $poll->poll($read, $write, $timeout);
+			if ($events) {
+				$status = $hub->recv();
+				if ($beat) $this->out('!', array('nl' => 1));
+				if ($log) $this->out('Alive: ', array('nl' => 0, 'style' => 'blue'));
+				if ($log) $this->out($status, array('nl' => 1, 'style' => 'green'));
+			} else {
+				if (++$attempts >= 3) {
+					if ($beat) $this->out('', array('nl' => 1));
+					$this->out('!ERROR! ', array('nl' => 0, 'style' => 'red'));
+					$this->out('HUB has not responded for [', array('nl' => 0, 'style' => 'green'));
+					$this->out($delay * $attempts, array('nl' => 0, 'style' => 'blue'));
+					$this->out('] seconds!', array('nl' => 2, 'style' => 'green'));
+				}
+				if ($beat) $this->out('?', array('nl' => 0));
+				$hub->send('status');
+			}
+		}
+	}
+
+	/**
 	 * Make a client request
 	 *  Usage: li3 zmq client [request string] [--log]
 	 *	--log	Provide text output
