@@ -75,9 +75,9 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = $response->merge($one,$two);
 		$this->assertEqual($expected, $result);
 
-		$one = array('count' => 2, 'total' => 3, 'data' => array('one', 'two'));
-		$two = array('count' => 3, 'total' => 4, 'data' => array('three', 'four'));
-		$expected = array('count' => 5, 'total' => 7, 'data' => array('one', 'two', 'three', 'four'));
+		$one = array('count' => 2, 'total' => 3, 'data' => array(1=>'one', 2=>'two'));
+		$two = array('count' => 3, 'total' => 4, 'data' => array(11=>'three', 12=>'four'));
+		$expected = array('count' => 5, 'total' => 7, 'data' => array(1=>'one', 2=>'two', 11=>'three', 12=>'four'));
 		$result = $response->merge($one,$two);
 		$this->assertEqual($expected, $result);
 	}

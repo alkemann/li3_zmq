@@ -9,7 +9,8 @@
 
 namespace li3_zmq\tests\cases\extensions\data\source;
 
-use li3_zmq\extensions\data\source\Zeromq;
+//use li3_zmq\extensions\data\source\Zeromq;
+use li3_zmq\tests\mocks\zmq\MockZeromq;
 use lithium\data\Connections;
 use li3_zmq\tests\mocks\zmq\MockZMQ;
 use lithium\data\model\Query;
@@ -28,14 +29,14 @@ class ZeromqTest extends \lithium\test\Unit {
 
 	public function skip() {
 		Connections::add('zmq-test', array(
-			'type' => 'Zeromq',
+			'type' => 'li3_zmq\tests\mocks\zmq\MockZeromq',
 			'model'	=> array(
 				'posts' => '\li3_zmq\tests\mocks\models\Posts'
 			),
 			'classes' => $this->__classes
 		));
 		Connections::add('zmq-test-entity', array(
-			'type' => 'Zeromq',
+			'type' => 'li3_zmq\tests\mocks\zmq\MockZeromq',
 			'model'	=> array(
 				'posts' => '\li3_zmq\tests\mocks\models\Posts'
 			),
@@ -55,7 +56,7 @@ class ZeromqTest extends \lithium\test\Unit {
 
 	public function testConnection() {
 		$connection = Connections::get('zmq-test');
-		$this->assertTrue($connection instanceof Zeromq);
+		$this->assertTrue($connection instanceof MockZeromq);
 		$socket = $connection->connection;
 		$this->assertTrue($socket instanceof \li3_zmq\tests\mocks\zmq\MockSocket);
 
@@ -65,7 +66,7 @@ class ZeromqTest extends \lithium\test\Unit {
 
 		$connection->connect();
 
-		$this->assertTrue($connection instanceof Zeromq);
+		$this->assertTrue($connection instanceof MockZeromq);
 
 		Connections::add('zmq-test-config', array(
 			'type' => 'Zeromq',
@@ -113,32 +114,6 @@ class ZeromqTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testSend() {
-		$con = Connections::get('zmq-test');
-
-		$expected ='PRESIDENT';
-		$con->send($expected);
-		$result = $con->connection->msg;
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testRecv() {
-		$con = Connections::get('zmq-test');
-
-		$con->connection->msg = $expected ='PRESIDENT';
-		$result = $con->recv();
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testSendRecv() {
-		$con = Connections::get('zmq-test');
-
-		$expected ='PRESIDENT';
-		$con->send($expected);
-		$result = $con->recv();
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testSources() {
 		$con = Connections::get('zmq-test');
 
@@ -182,7 +157,10 @@ class ZeromqTest extends \lithium\test\Unit {
 			'type'       => 'read',
 			'model'      => '\li3_zmq\tests\mocks\models\Posts',
 		));
-		$result = $con->read($query);
+		$options = array(
+			'model' => '\li3_zmq\tests\mocks\models\Posts'
+		);
+		$result = $con->read($query,$options);
 		$this->assertTrue($result instanceof \lithium\data\Collection);
 		$expected = 'get/posts';
 		$this->assertEqual($expected, $result->stats('request'));

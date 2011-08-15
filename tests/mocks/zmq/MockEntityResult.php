@@ -26,4 +26,8 @@ class MockEntityResult extends \li3_zmq\extensions\data\source\zeromq\Result {
 		);
 	}
 
+	public function valid() {
+		return true;
+	}
+
 }
