@@ -229,6 +229,7 @@ class Zmq extends \lithium\console\Command {
 			$poll->add($hub->socket(), \ZMQ::POLL_IN); // use connections config for pull duration
 			$events = $poll->poll($read, $write, $timeout);
 			if ($events) {
+				$attempts = 0;
 				$status = $hub->recv();
 				if ($beat) $this->out('!', array('nl' => 1));
 				if ($log) $this->out('Alive: ', array('nl' => 0, 'style' => 'blue'));
@@ -239,7 +240,7 @@ class Zmq extends \lithium\console\Command {
 					$this->out('!ERROR! ', array('nl' => 0, 'style' => 'red'));
 					$this->out('HUB has not responded for [', array('nl' => 0, 'style' => 'green'));
 					$this->out($delay * $attempts, array('nl' => 0, 'style' => 'blue'));
-					$this->out('] seconds!', array('nl' => 2, 'style' => 'green'));
+					$this->out('] seconds!', array('nl' => 1, 'style' => 'green'));
 				}
 				if ($beat) $this->out('?', array('nl' => 0));
 				$hub->send('status');
