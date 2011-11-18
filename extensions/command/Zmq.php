@@ -66,6 +66,7 @@ use lithium\data\Connections;
 class Zmq extends \lithium\console\Command {
 
 	private $__context;
+    protected $beat_interval = 3000; // msec
 
 	protected function _init() {
 		parent::_init();
@@ -132,7 +133,7 @@ class Zmq extends \lithium\console\Command {
 
 			$poll = new \ZMQPoll();
 			$poll->add($responder->socket(), \ZMQ::POLL_IN); // use connections config for pull duration
-			$events = $poll->poll($read, $write, 3 /** sec ***/ * 1000000);
+			$events = $poll->poll($read, $write, $this->milliseconds($this->beat_interval));
 
 			$now = microtime(true);
 
@@ -211,7 +212,7 @@ class Zmq extends \lithium\console\Command {
 	 *	--log	Provide text output
 	 *	--beat	Include beats in output
 	 *
-	 * @param float $delay
+	 * @param float $delay Time between requests in seconds
 	 */
 	public function supervise($delay = 60.0) {
 		$log = isset($this->log);
@@ -219,7 +220,7 @@ class Zmq extends \lithium\console\Command {
 
 		$hub = $this->__connection('hub')->connect();
 
-		$timeout = $delay /** seconds **/ * 1000000;
+		$timeout = $this->secondsToMilliSeconds($delay);
 		$attempts = 0;
 
 		$read = $write = array();
@@ -227,7 +228,7 @@ class Zmq extends \lithium\console\Command {
 		while (true) {
 			$poll = new \ZMQPoll();
 			$poll->add($hub->socket(), \ZMQ::POLL_IN); // use connections config for pull duration
-			$events = $poll->poll($read, $write, $timeout);
+			$events = $poll->poll($read, $write, $this->milliseconds($timeout));
 			if ($events) {
 				$attempts = 0;
 				$status = $hub->recv();
@@ -386,4 +387,18 @@ class Zmq extends \lithium\console\Command {
 		return $responder;
 	}
 
+    protected function secondsToMilliSeconds($sec) {
+        return $sec/1000;
+    }
+    protected function seconds($msec) {
+        return $msec*1000;
+    }
+
+    protected function milliseconds($msec) {
+        return $msec;
+    }
+
+    protected function microseconds($msec) {
+        return $msec/1000;
+    }
 }
