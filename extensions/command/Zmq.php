@@ -187,7 +187,7 @@ class Zmq extends \lithium\console\Command {
 			} else {
 				if ($beat) echo '.';
 			}
-			$expiry = $lastHeardFromHub + 9 /** sec **/;
+			$expiry = $lastHeardFromHub + ($this->seconds($this->beat_interval) * 3) + 1 /** sec **/;
 			if ($now > $expiry) {
 				if ($attempts++ >= 3) {
 					if ($log) {
@@ -388,10 +388,10 @@ class Zmq extends \lithium\console\Command {
 	}
 
     protected function secondsToMilliSeconds($sec) {
-        return $sec/1000;
+        return $sec*1000;
     }
     protected function seconds($msec) {
-        return $msec*1000;
+        return $msec / 1000;
     }
 
     protected function milliseconds($msec) {
@@ -399,6 +399,6 @@ class Zmq extends \lithium\console\Command {
     }
 
     protected function microseconds($msec) {
-        return $msec/1000;
+        return $msec * 1000;
     }
 }
